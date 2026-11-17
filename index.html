@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#073b78">
+<meta name="description" content="Calculador Kamban - controle de caixas, peças, metas e relatório de produção.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<title>Calculador Kamban</title>
+<style>
+:root{color-scheme:light;--blue:#0755a4;--navy:#08294f;--gold:#ffbd19;--bg:#eef3f9;--ink:#142238}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font:16px system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink)}
+header{background:linear-gradient(135deg,#061f40,#0865bd);color:white;padding:22px 16px 18px;border-bottom:5px solid var(--gold)}
+.brand{display:flex;align-items:center;gap:12px;max-width:760px;margin:auto}.brand img{width:62px;height:62px}.brand h1{font-size:23px;line-height:1.1;margin:0}.brand p{margin:5px 0 0;color:#dcecff;font-size:13px}
+main{max-width:760px;margin:16px auto;padding:0 12px 36px}.card{background:white;border:1px solid #d8e1ec;border-radius:16px;padding:16px;margin:12px 0;box-shadow:0 3px 12px #18375b0b}
+h2{font-size:18px;margin:0 0 12px;color:var(--navy)}h3{font-size:17px;margin:0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field{display:flex;flex-direction:column;gap:5px;margin:8px 0}.field label{font-size:13px;font-weight:700;color:#43536a}.field input{width:100%;padding:12px;border:1px solid #b9c8d9;border-radius:10px;font-size:17px;background:#fff;color:#12243a}
+input:focus{outline:2px solid #69aaf0;border-color:var(--blue)}.itemhead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}.chip{font-size:12px;font-weight:700;background:#e7f1ff;color:#0755a4;border-radius:30px;padding:6px 9px;white-space:nowrap}
+.result{background:#edf6ff;border-radius:11px;padding:12px;margin-top:10px}.resultrow{display:flex;justify-content:space-between;gap:10px;padding:3px 0;font-size:14px}.resultrow.total{font-weight:800;font-size:17px;color:#0755a4;border-top:1px solid #c8ddf4;margin-top:6px;padding-top:9px}
+button{border:0;border-radius:12px;padding:14px 16px;font-size:16px;font-weight:800;cursor:pointer}.primary{background:linear-gradient(135deg,#0866bf,#073d7c);color:#fff;width:100%}.secondary{background:#e8eff7;color:#12375f;width:100%;margin-top:8px}.muted{font-size:12px;color:#66768b;line-height:1.45}.grand{background:#092e59;color:#fff;border-radius:14px;padding:16px;display:flex;justify-content:space-between;align-items:center;font-weight:800}.grand strong{font-size:25px;color:#ffcf42}.report{white-space:pre-wrap;overflow-wrap:anywhere;background:#f7f9fc;border:1px solid #dce5ef;padding:12px;border-radius:10px;font:14px/1.5 ui-monospace,SFMono-Regular,monospace}
+@media(max-width:420px){.grid{grid-template-columns:1fr}.brand h1{font-size:21px}}
+</style>
+</head>
+<body>
+<header><div class="brand"><img src="icon.svg" alt=""><div><h1>Calculador Kamban</h1><p>Caixas • Peças • Metas • Relatório</p></div></div></header>
+<main>
+<section class="card">
+<h2>Levantamento</h2>
+<div class="grid">
+<div class="field"><label for="date">Data do levantamento</label><input id="date" value="16/11/2026"></div>
+<div class="field"><label for="hour">Horário</label><input id="hour" value="14:00"></div>
+</div>
+<p class="muted">Informe o número de caixas em cada categoria. O aplicativo converte caixas em peças e soma automaticamente.</p>
+</section>
+<div id="items"></div>
+<div class="grand"><span>Total geral dos 4 itens</span><strong id="grand">0 peças</strong></div>
+<section class="card">
+<h2>Programação da área do gás</h2>
+<div class="grid">
+<div class="field"><label for="month">Mês</label><input id="month" value="NOVEMBRO"></div>
+<div class="field"><label for="year">Ano</label><input id="year" type="number" value="2026"></div>
+</div>
+<div class="grid" id="program-fields"></div>
+<div class="field"><label for="days">Prazo da meta (dias)</label><input id="days" value="2,5"></div>
+<div class="resultrow total"><span>Total da programação diária</span><strong id="program-total">30.400 peças/dia</strong></div>
+</section>
+<section class="card">
+<h2>Relatório para WhatsApp</h2>
+<div class="report" id="report"></div>
+<button class="primary" id="copy">Copiar relatório para WhatsApp</button>
+<button class="secondary" id="share">Compartilhar relatório</button>
+<p class="muted">O botão Copiar coloca o texto na área de transferência. Depois, abra o grupo do WhatsApp e cole. Compartilhar pode abrir diretamente a lista de aplicativos, se o navegador oferecer esse recurso.</p>
+</section>
+<section class="card">
+<h2>Instalar na tela inicial</h2>
+<p class="muted">Depois que esta pasta estiver publicada em um endereço HTTPS, abra o endereço no Chrome do Android, toque no menu ⋮ e escolha “Instalar app” ou “Adicionar à tela inicial”. O pacote inclui os arquivos necessários para isso.</p>
+</section>
+</main>
+<script>
+const items=[
+ {name:"Tampa 506/8A",id:"t",unit:380,meta:29700},
+ {name:"Corpo 505",id:"b",unit:450,meta:24250},
+ {name:"Corpo 506/1",id:"c",unit:300,meta:15000},
+ {name:"Corpo 504",id:"d",unit:300,meta:27500}
+];
+const program=[["504","p504",11000],["505","p505",9700],["506","p506",5600],["Especiais","esp",3000],["Industriais","ind",700]];
+const $=id=>document.getElementById(id);
+const fmt=n=>Math.round(n).toLocaleString("pt-BR");
+const val=id=>Math.max(0,Number(String($(id).value||"0").replace(",","."))||0);
+function build(){
+ $("items").innerHTML=items.map(x=>`<section class="card" data-item="${x.id}">
+ <div class="itemhead"><h3>${x.name}</h3><span class="chip">${x.unit} peças por caixa</span></div>
+ <div class="grid">
+ ${[["Caixas usinadas","u"],["Caixas para usinar","p"],["Caixas Kanban","k"]].map(([label,s])=>`<div class="field"><label for="${x.id}${s}">${label}</label><input id="${x.id}${s}" type="number" min="0" step="1" value="0" inputmode="numeric" placeholder="Nº de caixas"></div>`).join("")}
+ </div>
+ <div class="field"><label for="m${x.id}">Meta de estoque (peças)</label><input id="m${x.id}" type="number" min="0" value="${x.meta}" inputmode="numeric"></div>
+ <div class="result">
+ <div class="resultrow"><span>Usinadas</span><strong id="${x.id}ru">0 peças</strong></div>
+ <div class="resultrow"><span>Para usinar</span><strong id="${x.id}rp">0 peças</strong></div>
+ <div class="resultrow"><span>Kanban</span><strong id="${x.id}rk">0 peças</strong></div>
+ <div class="resultrow total"><span>Total do item</span><strong id="${x.id}rt">0 peças</strong></div>
+ </div></section>`).join("");
+ $("program-fields").innerHTML=program.map(([label,id,n])=>`<div class="field"><label for="${id}">${label} — peças por dia</label><input id="${id}" type="number" min="0" value="${n}" inputmode="numeric"></div>`).join("");
+}
+function calculate(){
+ let total=0;
+ const detail=items.map(x=>{
+  const u=val(x.id+"u")*x.unit,p=val(x.id+"p")*x.unit,k=val(x.id+"k")*x.unit,t=u+p+k;total+=t;
+  $(""+x.id+"ru").textContent=fmt(u)+" peças";$(""+x.id+"rp").textContent=fmt(p)+" peças";$(""+x.id+"rk").textContent=fmt(k)+" peças";$(""+x.id+"rt").textContent=fmt(t)+" peças";
+  return {x,u,p,k,t,meta:val("m"+x.id)};
+ });
+ $("grand").textContent=fmt(total)+" peças";
+ const prog=program.reduce((s,row)=>s+val(row[1]),0);$("program-total").textContent=fmt(prog)+" peças/dia";
+ const report=`*Boa tarde a todos*\\n\\n*${$("date").value}*\\n\\n*Levantamento realizado as ${$("hour").value} nas CUSI's*\\n\\n${detail.map(r=>`${r.x.name}\\n\\n${fmt(r.u)} Pç. Usinadas\\n${fmt(r.p)} Pç. Para usinar\\n${fmt(r.k)} Pç. Kamban\\n*Total = ${fmt(r.t)} pç*\\n*Meta ${fmt(r.meta)} pç - ${$("days").value} dias*`).join("\\n\\n")}\\n\\n*PROGRAMAÇÃO ÁREA DO GÁS, MÊS DE ${$("month").value} - ${$("year").value}*\\n\\n504: ${fmt(val("p504"))} Peças dia\\n505: ${fmt(val("p505"))} Peças dia\\n506: ${fmt(val("p506"))} Peças dia\\nEspeciais: ${fmt(val("esp"))} dia\\nIndustriais: ${fmt(val("ind"))} peças dia\\n\\n*Total: ${fmt(prog)} pç dia*`;
+ $("report").textContent=report;
+ try{localStorage.setItem("calculadorKamban",JSON.stringify(Object.fromEntries([...document.querySelectorAll("input")].map(i=>[i.id,i.value]))));}catch(e){}
+}
+build();
+try{const saved=JSON.parse(localStorage.getItem("calculadorKamban")||"{}");for(const [id,v] of Object.entries(saved))if($(id))$(id).value=v;}catch(e){}
+document.addEventListener("input",e=>{if(e.target.matches("input"))calculate()});
+$("copy").addEventListener("click",async()=>{
+ const text=$("report").textContent;
+ try{await navigator.clipboard.writeText(text);$("copy").textContent="Relatório copiado!";setTimeout(()=>$("copy").textContent="Copiar relatório para WhatsApp",2200);}
+ catch(e){const t=document.createElement("textarea");t.value=text;document.body.appendChild(t);t.select();document.execCommand("copy");t.remove();$("copy").textContent="Relatório copiado!";setTimeout(()=>$("copy").textContent="Copiar relatório para WhatsApp",2200);}
+});
+$("share").addEventListener("click",async()=>{const text=$("report").textContent;if(navigator.share){try{await navigator.share({text,title:"Relatório Calculador Kamban"});}catch(e){}}else{await navigator.clipboard?.writeText(text);alert("Relatório copiado. Cole no WhatsApp.");}});
+calculate();
+if("serviceWorker" in navigator && location.protocol.startsWith("http"))navigator.serviceWorker.register("./sw.js").catch(()=>{});
+</script>
+</body></html>

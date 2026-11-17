@@ -1,0 +1,16 @@
+{
+  "name": "Calculador Kamban",
+  "short_name": "Kamban",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#eef3f9",
+  "theme_color": "#073b78",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

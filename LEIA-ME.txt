@@ -1,0 +1,11 @@
+CALCULADOR KAMBAN
+
+Arquivos de uma aplicação web instalável (PWA).
+
+Para instalar como app no Android:
+1. Publique o conteúdo desta pasta em um endereço HTTPS.
+2. Abra esse endereço no Google Chrome do Android.
+3. Abra o menu ⋮ e escolha 'Instalar app' ou 'Adicionar à tela inicial'.
+
+O app guarda os valores no próprio navegador do aparelho. Os códigos e peças por caixa são:
+Tampa 506/8A: 380; Corpo 505: 450; Corpo 506/1: 300; Corpo 504: 300.
