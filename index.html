@@ -188,7 +188,6 @@ function calculate(){
  const prog=program.reduce((s,row)=>s+val(row[1]),0);
  $("program-total").textContent=fmt(prog)+" peças/dia";
 
- // Monta cada produto com quebras de linha reais.
  const itensReport=detail.map(r=>[
   r.x.name,
   "",
@@ -199,7 +198,6 @@ function calculate(){
   `*Meta ${fmt(r.meta)} pç - ${$("days").value} dias*`
  ].join("\n")).join("\n\n");
 
- // Monta o relatório completo.
  const report=[
   "*Boa tarde a todos*",
   "",
@@ -285,4 +283,3 @@ if("serviceWorker" in navigator && location.protocol.startsWith("http")){
 </script>
 </body>
 </html>
-
