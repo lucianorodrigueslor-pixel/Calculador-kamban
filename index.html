@@ -1,241 +1,522 @@
+
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#073b78">
+<title>Calculador Kamban</title>
+
+<style>
+:root{
+color-scheme:light;
+--blue:#0755a4;
+--navy:#08294f;
+--gold:#ffbd19;
+--bg:#eef3f9;
+--ink:#142238;
+}
+*{box-sizing:border-box}
+body{
+margin:0;
+background:var(--bg);
+font:16px system-ui,sans-serif;
+color:var(--ink);
+}
+header{
+background:linear-gradient(135deg,#061f40,#0865bd);
+color:white;
+padding:22px 16px;
+border-bottom:5px solid var(--gold);
+}
+.brand{
+display:flex;
+align-items:center;
+gap:12px;
+max-width:760px;
+margin:auto;
+}
+.brand img{width:62px;height:62px}
+.brand h1{font-size:23px;margin:0}
+.brand p{margin:5px 0 0;color:#dcecff;font-size:13px}
+main{max-width:760px;margin:16px auto;padding:0 12px 36px}
+.card{
+background:white;
+border:1px solid #d8e1ec;
+border-radius:16px;
+padding:16px;
+margin:12px 0;
+box-shadow:0 3px 12px #18375b0b;
+}
+h2{font-size:18px;margin:0 0 12px;color:var(--navy)}
+h3{font-size:17px;margin:0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.field{display:flex;flex-direction:column;gap:5px;margin:8px 0}
+.field label{font-size:13px;font-weight:700;color:#43536a}
+.field input{
+width:100%;
+padding:12px;
+border:1px solid #b9c8d9;
+border-radius:10px;
+font-size:17px;
+background:#fff;
+color:#12243a;
+}
+input:focus{outline:2px solid #69aaf0;border-color:var(--blue)}
+.itemhead{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:8px;
+margin-bottom:8px;
+}
+.chip{
+font-size:12px;
+font-weight:700;
+background:#e7f1ff;
+color:#0755a4;
+border-radius:30px;
+padding:6px 9px;
+white-space:nowrap;
+}
+.result{background:#edf6ff;border-radius:11px;padding:12px;margin-top:10px}
+.resultrow{
+display:flex;
+justify-content:space-between;
+gap:10px;
+padding:3px 0;
+font-size:14px;
+}
+.resultrow.total{
+font-weight:800;
+font-size:17px;
+color:#0755a4;
+border-top:1px solid #c8ddf4;
+margin-top:6px;
+padding-top:9px;
+}
+button{
+border:0;
+border-radius:12px;
+padding:14px 16px;
+font-size:16px;
+font-weight:800;
+cursor:pointer;
+}
+.primary{
+background:linear-gradient(135deg,#0866bf,#073d7c);
+color:#fff;
+width:100%;
+}
+.secondary{
+background:#e8eff7;
+color:#12375f;
+width:100%;
+margin-top:8px;
+}
+.muted{font-size:12px;color:#66768b;line-height:1.45}
+.grand{
+background:#092e59;
+color:#fff;
+border-radius:14px;
+padding:16px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+font-weight:800;
+}
+.grand strong{font-size:25px;color:#ffcf42}
+.report{
+white-space:pre-wrap;
+overflow-wrap:anywhere;
+background:#f7f9fc;
+border:1px solid #dce5ef;
+padding:12px;
+border-radius:10px;
+font:14px/1.5 monospace;
+}
+@media(max-width:420px){
+.grid{grid-template-columns:1fr}
+.brand h1{font-size:21px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<div class="brand">
+<img src="icon.svg" alt="">
+<div>
+<h1>Calculador Kamban</h1>
+<p>Caixas • Peças • Metas • Relatório</p>
+</div>
+</div>
+</header>
+
+<main>
+
+<section class="card">
+<h2>Levantamento</h2>
+<div class="grid">
+<div class="field">
+<label for="date">Data do levantamento</label>
+<input id="date" value="17/11/2026">
+</div>
+<div class="field">
+<label for="hour">Horário</label>
+<input id="hour" value="14:00">
+</div>
+</div>
+<p class="muted">
+Informe o número de caixas em cada categoria.
+O aplicativo converte caixas em peças e soma automaticamente.
+</p>
+</section>
+
+<div id="items"></div>
+
+<div class="grand">
+<span>Total geral dos 4 itens</span>
+<strong id="grand">0 peças</strong>
+</div>
+
+<section class="card">
+<h2>Programação da área do gás</h2>
+
+<div class="grid">
+<div class="field">
+<label for="month">Mês</label>
+<input id="month" value="NOVEMBRO">
+</div>
+<div class="field">
+<label for="year">Ano</label>
+<input id="year" type="number" value="2026">
+</div>
+</div>
+
+<div class="grid" id="program-fields"></div>
+
+<div class="field">
+<label for="days">Prazo da meta (dias)</label>
+<input id="days" value="2,5">
+</div>
+
+<div class="resultrow total">
+<span>Total da programação diária</span>
+<strong id="program-total">30.000 peças/dia</strong>
+</div>
+</section>
+
+<section class="card">
+<h2>Relatório para WhatsApp</h2>
+<div class="report" id="report"></div>
+
+<button class="primary" id="copy">
+Copiar relatório para WhatsApp
+</button>
+
+<button class="secondary" id="share">
+Compartilhar relatório
+</button>
+
+<p class="muted">
+O botão Copiar coloca o texto na área de transferência.
+Depois, abra o grupo do WhatsApp e cole.
+</p>
+</section>
+
+<section class="card">
+<h2>Instalar na tela inicial</h2>
+<p class="muted">
+Abra o endereço publicado no Chrome do Android,
+toque no menu e escolha Instalar app ou Adicionar à tela inicial.
+</p>
+</section>
+
+</main>
+
+<script>
+
+const items=[
+{name:"Tampa 506/8A",id:"t",unit:380,meta:29700},
+{name:"Corpo 505",id:"b",unit:450,meta:24250},
+{name:"Corpo 506/1",id:"c",unit:300,meta:15000},
+{name:"Corpo 504",id:"d",unit:300,meta:27500}
+];
+
+const program=[
+["504","p504",11000],
+["505","p505",9700],
+["506","p506",5600],
+["Especiais","esp",3000],
+["Industriais","ind",700]
+];
+
+const $=id=>document.getElementById(id);
+
+const fmt=n=>Math.round(n).toLocaleString("pt-BR");
+
+const val=id=>Math.max(
+0,
+Number(String($(id).value||"0").replace(",","."))||0
+);
+
+const NL=String.fromCharCode(10);
+
+function build(){
+
+$("items").innerHTML=items.map(x=>`
+<section class="card" data-item="${x.id}">
+
+<div class="itemhead">
+<h3>${x.name}</h3>
+<span class="chip">${x.unit} peças por caixa</span>
+</div>
+
+<div class="grid">
+
+${[
+["Caixas usinadas","u"],
+["Caixas para usinar","p"],
+["Caixas Kamban","k"]
+].map(([label,s])=>`
+<div class="field">
+<label for="${x.id}${s}">${label}</label>
+<input
+id="${x.id}${s}"
+type="number"
+min="0"
+step="1"
+value="0"
+inputmode="numeric"
+placeholder="Nº de caixas">
+</div>
+`).join("")}
+
+</div>
+
+<div class="field">
+<label for="m${x.id}">Meta de estoque (peças)</label>
+<input
+id="m${x.id}"
+type="number"
+min="0"
+value="${x.meta}"
+inputmode="numeric">
+</div>
+
+<div class="result">
+
+<div class="resultrow">
+<span>Usinadas</span>
+<strong id="${x.id}ru">0 peças</strong>
+</div>
+
+<div class="resultrow">
+<span>Para usinar</span>
+<strong id="${x.id}rp">0 peças</strong>
+</div>
+
+<div class="resultrow">
+<span>Kamban</span>
+<strong id="${x.id}rk">0 peças</strong>
+</div>
+
+<div class="resultrow total">
+<span>Total do item</span>
+<strong id="${x.id}rt">0 peças</strong>
+</div>
+
+</div>
+</section>
+`).join("");
+
+$("program-fields").innerHTML=program.map(
+([label,id,n])=>`
+<div class="field">
+<label for="${id}">${label} — peças por dia</label>
+<input
+id="${id}"
+type="number"
+min="0"
+value="${n}"
+inputmode="numeric">
+</div>
+`
+).join("");
+
+}
+
 function calculate(){
- let total=0;
 
- const detail=items.map(x=>{
-  const u=val(x.id+"u")*x.unit;
-  const p=val(x.id+"p")*x.unit;
-  const k=val(x.id+"k")*x.unit;
-  const t=u+p+k;
-  total+=t;
+let total=0;
 
-  $(x.id+"ru").textContent=fmt(u)+" peças";
-  $(x.id+"rp").textContent=fmt(p)+" peças";
-  $(x.id+"rk").textContent=fmt(k)+" peças";
-  $(x.id+"rt").textContent=fmt(t)+" peças";
+const detail=items.map(x=>{
 
-  return {x,u,p,k,t,meta:val("m"+x.id)};
- });
+const u=val(x.id+"u")*x.unit;
+const p=val(x.id+"p")*x.unit;
+const k=val(x.id+"k")*x.unit;
 
- $("grand").textContent=fmt(total)+" peças";
+const t=u+p+k;
 
- const prog=program.reduce((s,row)=>s+val(row[1]),0);
- $("program-total").textContent=fmt(prog)+" peças/dia";
+total+=t;
 
- const itensReport=detail.map(r=>[
-  r.x.name,
-  "",
-  `${fmt(r.u)} Pç. Usinadas`,
-  `${fmt(r.p)} Pç. Para usinar`,
-  `${fmt(r.k)} Pç. Kamban`,
-  `*Total = ${fmt(r.t)} pç*`,
-  `*Meta ${fmt(r.meta)} pç - ${$("days").value} dias*`
- ].join(NL)).join(NL+NL);
+$(x.id+"ru").textContent=fmt(u)+" peças";
+$(x.id+"rp").textContent=fmt(p)+" peças";
+$(x.id+"rk").textContent=fmt(k)+" peças";
+$(x.id+"rt").textContent=fmt(t)+" peças";
 
- const report=[
-  "*Boa tarde a todos*",
-  "",
-  `*${$("date").value}*`,
-  "",
-  `*Levantamento realizado as ${$("hour").value} nas CUSI's*`,
-  "",
-  itensReport,
-  "",
-  `*PROGRAMAÇÃO ÁREA DO GÁS, MÊS DE ${$("month").value} - ${$("year").value}*`,
-  "",
-  `504: ${fmt(val("p504"))} Peças dia`,
-  `505: ${fmt(val("p505"))} Peças dia`,
-  `506: ${fmt(val("p506"))} Peças dia`,
-  `Especiais: ${fmt(val("esp"))} dia`,
-  `Industriais: ${fmt(val("ind"))} peças dia`,
-  "",
-  `*Total: ${fmt(prog)} pç dia*`
- ].join(NL);
+return {
+x,u,p,k,t,
+meta:val("m"+x.id)
+};
 
- $("report").textContent=report;
+});
 
- try{
-  localStorage.setItem(
-   "calculadorKamban",
-   JSON.stringify(Object.fromEntries(
-    [...document.querySelectorAll("input")].map(i=>[i.id,i.value])
-   ))
-  );
- }catch(e){}
+$("grand").textContent=fmt(total)+" peças";
+
+const prog=program.reduce(
+(s,row)=>s+val(row[1]),0
+);
+
+$("program-total").textContent=
+fmt(prog)+" peças/dia";
+
+const itensReport=detail.map(r=>[
+r.x.name,
+"",
+`${fmt(r.u)} Pç. Usinadas`,
+`${fmt(r.p)} Pç. Para usinar`,
+`${fmt(r.k)} Pç. Kamban`,
+`*Total = ${fmt(r.t)} pç*`,
+`*Meta ${fmt(r.meta)} pç - ${$("days").value} dias*`
+].join(NL)).join(NL+NL);
+
+const report=[
+
+"*Boa tarde a todos*",
+"",
+`*${$("date").value}*`,
+"",
+`*Levantamento realizado as ${$("hour").value} nas CUSI's*`,
+"",
+itensReport,
+"",
+`*PROGRAMAÇÃO ÁREA DO GÁS, MÊS DE ${$("month").value} - ${$("year").value}*`,
+"",
+`504: ${fmt(val("p504"))} Peças dia`,
+`505: ${fmt(val("p505"))} Peças dia`,
+`506: ${fmt(val("p506"))} Peças dia`,
+`Especiais: ${fmt(val("esp"))} dia`,
+`Industriais: ${fmt(val("ind"))} peças dia`,
+"",
+`*Total: ${fmt(prog)} pç dia*`
+
+].join(NL);
+
+$("report").textContent=report;
+
+try{
+localStorage.setItem(
+"calculadorKamban",
+JSON.stringify(
+Object.fromEntries(
+[...document.querySelectorAll("input")]
+.map(i=>[i.id,i.value])
+)
+)
+);
+}catch(e){}
+
 }
 
 build();
 
 try{
- const saved=JSON.parse(localStorage.getItem("calculadorKamban")||"{}");
- for(const [id,v] of Object.entries(saved)){
-  if($(id))$(id).value=v;
- }
+
+const saved=JSON.parse(
+localStorage.getItem("calculadorKamban")||"{}"
+);
+
+for(const [id,v] of Object.entries(saved)){
+if($(id))$(id).value=v;
+}
+
 }catch(e){}
 
 document.addEventListener("input",e=>{
- if(e.target.matches("input"))calculate();
+if(e.target.matches("input"))calculate();
 });
 
 $("copy").addEventListener("click",async()=>{
- const reportText=$("report").textContent;
 
- try{
-  await navigator.clipboard.writeText(reportText);
-  $("copy").textContent="Relatório copiado!";
-  setTimeout(()=>$("copy").textContent="Copiar relatório para WhatsApp",2200);
- }catch(e){
-  const t=document.createElement("textarea");
-  t.value=reportText;
-  t.setAttribute("readonly","");
-  t.style.position="fixed";
-  t.style.opacity="0";
-  document.body.appendChild(t);
-  t.select();
-  document.execCommand("copy");
-  t.remove();
-  $("copy").textContent="Relatório copiado!";
-  setTimeout(()=>$("copy").textContent="Copiar relatório para WhatsApp",2200);
- }
+const reportText=$("report").textContent;
+
+try{
+
+await navigator.clipboard.writeText(reportText);
+
+$("copy").textContent="Relatório copiado!";
+
+setTimeout(
+()=>$("copy").textContent="Copiar relatório para WhatsApp",
+2200
+);
+
+}catch(e){
+
+const t=document.createElement("textarea");
+t.value=reportText;
+t.setAttribute("readonly","");
+t.style.position="fixed";
+t.style.opacity="0";
+
+document.body.appendChild(t);
+t.select();
+document.execCommand("copy");
+t.remove();
+
+$("copy").textContent="Relatório copiado!";
+
+setTimeout(
+()=>$("copy").textContent="Copiar relatório para WhatsApp",
+2200
+);
+
+}
+
 });
 
 $("share").addEventListener("click",async()=>{
- const reportText=$("report").textContent;
 
- if(navigator.share){
-  try{
-   await navigator.share({text:reportText,title:"Relatório Calculador Kamban"});
-  }catch(e){}
- }else{
-  try{
-   await navigator.clipboard.writeText(reportText);
-   alert("Relatório copiado. Cole no WhatsApp.");
-  }catch(e){
-   alert("Não foi possível copiar automaticamente. Use o botão Copiar relatório.");
-  }
- }
+const reportText=$("report").textContent;
+
+if(navigator.share){
+
+try{
+await navigator.share({
+text:reportText,
+title:"Relatório Calculador Kamban"
+});
+}catch(e){}
+
+}else{
+
+try{
+await navigator.clipboard.writeText(reportText);
+alert("Relatório copiado. Cole no WhatsApp.");
+}catch(e){
+alert("Não foi possível copiar automaticamente. Use o botão Copiar relatório.");
+}
+
+}
+
 });
 
 calculate();
 
-if("serviceWorker" in navigator && location.protocol.startsWith("http")){
- navigator.serviceWorker.register("./sw.js").catch(()=>{});
-}
 </script>
-<script>
-// Módulo Status de Fim de Turno — integrado ao Calculador Kamban
-const statusSections = ['Ferramentaria','Manutenção de Máquinas','Injeção Zamac','Injetoras de Alumínio','Injetoras de Plástico'];
-const statusMachines = {
-  zamac: ['18-01','18-02','18-03','20-09','20-11','20-12','20-14','20-16','30-28','30-42','30-43','50-33','50-34','50-35','70-26','160-29','160-39','160-40','160-41','160-44','160-45'],
-  aluminio: ['280-31','280-32','280-34'],
-  plastico: ['120-31','160-35','160-36','160-37','160-38']
-};
-const statusDefault = () => ({date:'',shift:'1º T',priorities:['',''],maintenance:[],machines:{
-  zamac: statusMachines.zamac.map(code=>({code,part:'',status:'Sem alteração'})),
-  aluminio: statusMachines.aluminio.map(code=>({code,part:'',status:'Sem alteração'})),
-  plastico: statusMachines.plastico.map(code=>({code,part:'',status:'Sem alteração'}))
-}});
-let statusData = statusDefault();
-let statusStage = -1;
-const statusGet = id => document.getElementById(id);
-function statusEscape(value){return String(value ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
-function statusPersist(){try{localStorage.setItem('statusDraft',JSON.stringify(statusData));}catch(e){}}
-function statusLoadDraft(){try{const saved=JSON.parse(localStorage.getItem('statusDraft')||'null');if(saved){const base=statusDefault();statusData={...base,...saved,machines:{...base.machines,...(saved.machines||{})}};for(const key of ['zamac','aluminio','plastico']){const rows=statusData.machines[key]||[];if(rows.length&&typeof rows[0]==='string'){statusData.machines[key]=base.machines[key].map((m,i)=>({...m,status:rows[i]||'Sem alteração'}));}}}}catch(e){statusData=statusDefault();}}
-function home(){['homeMenu','statusApp','historyApp','calculatorMain'].forEach(id=>statusGet(id).classList.add('hidden'));statusGet('homeMenu').classList.remove('hidden');statusGet('calculatorMain').style.display='none';}
-function openCalc(){home();statusGet('homeMenu').classList.add('hidden');statusGet('calculatorMain').style.display='block';statusGet('calculatorMain').classList.remove('hidden');}
-function startStatus(){statusLoadDraft();statusStage=-1;statusGet('homeMenu').classList.add('hidden');statusGet('historyApp').classList.add('hidden');statusGet('statusApp').classList.remove('hidden');statusGet('nextStage').classList.add('hidden');showStatusStage();}
-function statusBackToMenu(){home();}
-function statusNav(){return `<div class="statusNav"><button type="button" class="secondary" onclick="statusBack()">← Voltar</button><button type="button" class="primary" onclick="statusNext()">Salvar e avançar →</button></div>`;}
-function showStatusStage(){
- const content=statusGet('stageContent'), title=statusGet('stageTitle'), next=statusGet('nextStage');
- next.classList.add('hidden');
- if(statusStage===-1){title.textContent='Iniciar fechamento';content.innerHTML=`<p class="muted">Informe a data e o turno. Essas informações serão usadas em todas as etapas.</p><div class="field"><label for="statusDate">Data do fechamento</label><input id="statusDate" class="statusInput" type="date" value="${statusEscape(statusData.date)}"></div><div class="field"><label for="statusShift">Turno</label><select id="statusShift" class="statusInput"><option ${statusData.shift==='1º T'?'selected':''}>1º T</option><option ${statusData.shift==='2º T'?'selected':''}>2º T</option><option ${statusData.shift==='3º T'?'selected':''}>3º T</option></select></div><button class="primary" onclick="statusStartSections()">Começar fechamento →</button>`;return;}
- title.textContent=statusSections[statusStage];
- let html='';
- if(statusStage===0){html=`<p class="muted">Prioridades da Ferramentaria — adicione ou exclua linhas conforme necessário.</p>${statusData.priorities.map((v,i)=>statusTextRow('priorities',i,v,'Prioridade '+(i+1))).join('')}<button type="button" class="addRow" onclick="statusAdd('priorities')">+ Adicionar prioridade</button>`;}
- else if(statusStage===1){html=`<p class="muted">Registre as ocorrências da manutenção de máquinas.</p>${statusData.maintenance.map((v,i)=>statusTextRow('maintenance',i,v,'Ocorrência '+(i+1))).join('')}<button type="button" class="addRow" onclick="statusAdd('maintenance')">+ Adicionar ocorrência</button>`;}
- else {const key=['zamac','aluminio','plastico'][statusStage-2];html=`<p class="muted">Deixe “Sem alteração” quando não houver mudança. Preencha a peça e o status quando precisar atualizar.</p>`+statusData.machines[key].map((m,i)=>`<div class="statusRow machineRow"><div class="machineCode">${m.code}</div><div class="field"><label for="part-${key}-${i}">Nome da peça (opcional)</label><input id="part-${key}-${i}" class="statusInput" value="${statusEscape(m.part)}" placeholder="Ex.: CORPO 1B" oninput="statusMachineEdit('${key}',${i},'part',this.value)"></div><div class="field"><label for="state-${key}-${i}">Status / ocorrência</label><input id="state-${key}-${i}" class="statusInput" value="${statusEscape(m.status)}" oninput="statusMachineEdit('${key}',${i},'status',this.value)"></div></div>`).join('');}
- content.innerHTML=html+statusNav();
-}
-function statusTextRow(key,i,value,label){return `<div class="statusRow"><label>${label}</label><textarea class="statusInput" rows="2" oninput="statusData.${key}[${i}]=this.value;statusPersist()" placeholder="Digite aqui">${statusEscape(value)}</textarea><button type="button" class="remove" onclick="statusRemove('${key}',${i})">Excluir</button></div>`;}
-function statusStartSections(){const d=statusGet('statusDate').value;if(!d){alert('Informe a data do fechamento.');return;}statusData.date=d;statusData.shift=statusGet('statusShift').value;statusPersist();statusStage=0;showStatusStage();}
-function statusAdd(key){statusData[key].push('');statusPersist();showStatusStage();}
-function statusRemove(key,i){statusData[key].splice(i,1);statusPersist();showStatusStage();}
-function statusMachineEdit(key,i,field,value){statusData.machines[key][i][field]=value;statusPersist();}
-function statusBack(){if(statusStage>0){statusStage--;showStatusStage();}else if(statusStage===0){statusStage=-1;showStatusStage();}}
-function statusNext(){statusPersist();if(statusStage<4){statusStage++;showStatusStage();}else statusBuildReport();}
-function statusDateBR(){return statusData.date.split('-').reverse().join('/');}
-function statusFormatMachine(m){const part=(m.part||'').trim(),state=(m.status||'').trim()||'Sem alteração';return part?`${m.code} _ *${part}*_ ${state}`:`${m.code} _ ${state}`;}
- <script>
-// Módulo Status de Fim de Turno — integrado ao Calculador Kamban
-const statusSections = ['Ferramentaria','Manutenção de Máquinas','Injeção Zamac','Injetoras de Alumínio','Injetoras de Plástico'];
-const statusMachines = {
-  zamac: ['18-01','18-02','18-03','20-09','20-11','20-12','20-14','20-16','30-28','30-42','30-43','50-33','50-34','50-35','70-26','160-29','160-39','160-40','160-41','160-44','160-45'],
-  aluminio: ['280-31','280-32','280-34'],
-  plastico: ['120-31','160-35','160-36','160-37','160-38']
-};
-const statusDefault = () => ({date:'',shift:'1º T',priorities:['',''],maintenance:[],machines:{
-  zamac: statusMachines.zamac.map(code=>({code,part:'',status:'Sem alteração'})),
-  aluminio: statusMachines.aluminio.map(code=>({code,part:'',status:'Sem alteração'})),
-  plastico: statusMachines.plastico.map(code=>({code,part:'',status:'Sem alteração'}))
-}});
-let statusData = statusDefault();
-let statusStage = -1;
-const statusGet = id => document.getElementById(id);
-function statusEscape(value){return String(value ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
-function statusPersist(){try{localStorage.setItem('statusDraft',JSON.stringify(statusData));}catch(e){}}
-function statusLoadDraft(){try{const saved=JSON.parse(localStorage.getItem('statusDraft')||'null');if(saved){const base=statusDefault();statusData={...base,...saved,machines:{...base.machines,...(saved.machines||{})}};for(const key of ['zamac','aluminio','plastico']){const rows=statusData.machines[key]||[];if(rows.length&&typeof rows[0]==='string'){statusData.machines[key]=base.machines[key].map((m,i)=>({...m,status:rows[i]||'Sem alteração'}));}}}}catch(e){statusData=statusDefault();}}
-function home(){['homeMenu','statusApp','historyApp','calculatorMain'].forEach(id=>statusGet(id).classList.add('hidden'));statusGet('homeMenu').classList.remove('hidden');statusGet('calculatorMain').style.display='none';}
-function openCalc(){home();statusGet('homeMenu').classList.add('hidden');statusGet('calculatorMain').style.display='block';statusGet('calculatorMain').classList.remove('hidden');}
-function startStatus(){statusLoadDraft();statusStage=-1;statusGet('homeMenu').classList.add('hidden');statusGet('historyApp').classList.add('hidden');statusGet('statusApp').classList.remove('hidden');statusGet('nextStage').classList.add('hidden');showStatusStage();}
-function statusBackToMenu(){home();}
-function statusNav(){return `<div class="statusNav"><button type="button" class="secondary" onclick="statusBack()">← Voltar</button><button type="button" class="primary" onclick="statusNext()">Salvar e avançar →</button></div>`;}
-function showStatusStage(){
- const content=statusGet('stageContent'), title=statusGet('stageTitle'), next=statusGet('nextStage');
- next.classList.add('hidden');
- if(statusStage===-1){title.textContent='Iniciar fechamento';content.innerHTML=`<p class="muted">Informe a data e o turno. Essas informações serão usadas em todas as etapas.</p><div class="field"><label for="statusDate">Data do fechamento</label><input id="statusDate" class="statusInput" type="date" value="${statusEscape(statusData.date)}"></div><div class="field"><label for="statusShift">Turno</label><select id="statusShift" class="statusInput"><option ${statusData.shift==='1º T'?'selected':''}>1º T</option><option ${statusData.shift==='2º T'?'selected':''}>2º T</option><option ${statusData.shift==='3º T'?'selected':''}>3º T</option></select></div><button class="primary" onclick="statusStartSections()">Começar fechamento →</button>`;return;}
- title.textContent=statusSections[statusStage];
- let html='';
- if(statusStage===0){html=`<p class="muted">Prioridades da Ferramentaria — adicione ou exclua linhas conforme necessário.</p>${statusData.priorities.map((v,i)=>statusTextRow('priorities',i,v,'Prioridade '+(i+1))).join('')}<button type="button" class="addRow" onclick="statusAdd('priorities')">+ Adicionar prioridade</button>`;}
- else if(statusStage===1){html=`<p class="muted">Registre as ocorrências da manutenção de máquinas.</p>${statusData.maintenance.map((v,i)=>statusTextRow('maintenance',i,v,'Ocorrência '+(i+1))).join('')}<button type="button" class="addRow" onclick="statusAdd('maintenance')">+ Adicionar ocorrência</button>`;}
- else {const key=['zamac','aluminio','plastico'][statusStage-2];html=`<p class="muted">Deixe “Sem alteração” quando não houver mudança. Preencha a peça e o status quando precisar atualizar.</p>`+statusData.machines[key].map((m,i)=>`<div class="statusRow machineRow"><div class="machineCode">${m.code}</div><div class="field"><label for="part-${key}-${i}">Nome da peça (opcional)</label><input id="part-${key}-${i}" class="statusInput" value="${statusEscape(m.part)}" placeholder="Ex.: CORPO 1B" oninput="statusMachineEdit('${key}',${i},'part',this.value)"></div><div class="field"><label for="state-${key}-${i}">Status / ocorrência</label><input id="state-${key}-${i}" class="statusInput" value="${statusEscape(m.status)}" oninput="statusMachineEdit('${key}',${i},'status',this.value)"></div></div>`).join('');}
- content.innerHTML=html+statusNav();
-}
-function statusTextRow(key,i,value,label){return `<div class="statusRow"><label>${label}</label><textarea class="statusInput" rows="2" oninput="statusData.${key}[${i}]=this.value;statusPersist()" placeholder="Digite aqui">${statusEscape(value)}</textarea><button type="button" class="remove" onclick="statusRemove('${key}',${i})">Excluir</button></div>`;}
-function statusStartSections(){const d=statusGet('statusDate').value;if(!d){alert('Informe a data do fechamento.');return;}statusData.date=d;statusData.shift=statusGet('statusShift').value;statusPersist();statusStage=0;showStatusStage();}
-function statusAdd(key){statusData[key].push('');statusPersist();showStatusStage();}
-function statusRemove(key,i){statusData[key].splice(i,1);statusPersist();showStatusStage();}
-function statusMachineEdit(key,i,field,value){statusData.machines[key][i][field]=value;statusPersist();}
-function statusBack(){if(statusStage>0){statusStage--;showStatusStage();}else if(statusStage===0){statusStage=-1;showStatusStage();}}
-function statusNext(){statusPersist();if(statusStage<4){statusStage++;showStatusStage();}else statusBuildReport();}
-function statusDateBR(){return statusData.date.split('-').reverse().join('/');}
-function statusFormatMachine(m){const part=(m.part||'').trim(),state=(m.status||'').trim()||'Sem alteração';return part?`${m.code} _ *${part}*_ ${state}`:`${m.code} _ ${state}`;}
- function statusBuildReport(){
- const priorities=statusData.priorities.map(v=>v.trim()).filter(Boolean);
- const maintenance=statusData.maintenance.map(v=>v.trim()).filter(Boolean);
- const report=[
-  '*Boa tarde a todos*','',`*Fechamento do ${statusData.shift}*`,'',`*${statusDateBR()}*`,'',
-  '*Ferramentaria manutenção de moldes itens que estão no processo de injeção crítico PCP*','',
-  priorities.length?priorities.map((v,i)=>`${i+1}-(PRIORIDADE): ${v}`).join('\n'):'Sem prioridades no setor da ferramentaria.','',
-  '*Manutenção de máquinas*','',
-  maintenance.length?maintenance.join('\n\n'):'Sem ocorrências registradas.','',
-  '*Status de fim de turno*','',
-  '*INJEÇÃO ZAMAC*','',statusData.machines.zamac.map(statusFormatMachine).join('\n\n'),'',
-  '*INJETORAS DE ALUMÍNIO*','',statusData.machines.aluminio.map(statusFormatMachine).join('\n\n'),'',
-  '*INJETORAS DE PLÁSTICO*','',statusData.machines.plastico.map(statusFormatMachine).join('\n\n')
- ].join('\n');
- try{const history=JSON.parse(localStorage.getItem('statusHistory')||'[]');history.unshift({date:statusData.date,shift:statusData.shift,report});localStorage.setItem('statusHistory',JSON.stringify(history));localStorage.removeItem('statusDraft');}catch(e){}
- statusGet('stageTitle').textContent='Relatório final';
- statusGet('stageContent').innerHTML=`<p class="muted">Fechamento concluído — ${statusDateBR()} • ${statusData.shift}</p><div class="report" id="finalReport">${statusEscape(report)}</div><button class="primary" onclick="copyStatus()">Copiar relatório para WhatsApp</button><button class="secondary" onclick="shareStatus()">Compartilhar relatório</button><button class="secondary" onclick="home()">Menu principal</button>`;
- statusGet('nextStage').classList.add('hidden');
-}
-function copyStatus(){const text=statusGet('finalReport')?.textContent||'';const fallback=()=>{const a=document.createElement('textarea');a.value=text;a.style.position='fixed';a.style.opacity='0';document.body.appendChild(a);a.select();document.execCommand('copy');a.remove();alert('Relatório copiado!');};if(navigator.clipboard?.writeText)navigator.clipboard.writeText(text).then(()=>alert('Relatório copiado!')).catch(fallback);else fallback();}
-function shareStatus(){const text=statusGet('finalReport')?.textContent||'';if(navigator.share)navigator.share({text,title:'Status de Fim de Turno'}).catch(()=>{});else copyStatus();}
-function showHistory(){home();statusGet('homeMenu').classList.add('hidden');statusGet('historyApp').classList.remove('hidden');renderStatusHistory();}
-function renderStatusHistory(){let h=[];try{h=JSON.parse(localStorage.getItem('statusHistory')||'[]');}catch(e){}statusGet('historyContent').innerHTML=h.length?h.map((r,i)=>`<div class="statusRow"><b>${statusEscape(r.date.split('-').reverse().join('/'))} — ${statusEscape(r.shift||'')}</b><button class="secondary" onclick="viewHistory(${i})">Abrir relatório</button></div>`).join(''):'<p>Nenhum relatório salvo ainda.</p>';}
-function viewHistory(i){let h=[];try{h=JSON.parse(localStorage.getItem('statusHistory')||'[]');}catch(e){}const r=h[i];if(!r)return;statusGet('historyContent').innerHTML=`<button class="secondary" onclick="renderStatusHistory()">← Histórico</button><div class="report" id="finalReport">${statusEscape(r.report)}</div><button class="primary" onclick="copyStatus()">Copiar relatório</button><button class="secondary" onclick="shareStatus()">Compartilhar</button>`;}
-</script>
-<style>
-.statusInput{width:100%;padding:12px;border:1px solid #b9c8d9;border-radius:10px;font-size:16px;margin:5px 0 10px;background:#fff;color:#12243a}.statusRow{background:#fff;border:1px solid #d8e1ec;border-radius:12px;padding:12px;margin:10px 0}.statusRow textarea{width:100%;font:16px system-ui;padding:10px;border:1px solid #b9c8d9;border-radius:9px;min-height:60px}.statusRow label{font-size:13px;font-weight:700;color:#43536a}.statusRow .remove,.addRow{background:#e8eff7;color:#12375f;padding:9px 12px;border-radius:9px;font-size:14px}.statusNav{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}.statusNav button{font-size:14px;padding:11px 8px;margin:0}.machineCode{font-weight:800;color:#0755a4;font-size:17px;margin-bottom:5px}.machineRow .field{margin:5px 0}.machineRow .statusInput{margin-bottom:4px}
-</style>
+
 </body>
 </html>
