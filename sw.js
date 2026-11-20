@@ -1,5 +1,5 @@
 
-const CACHE = 'calculador-kamban-v2';
+const CACHE = 'calculador-kamban-v3';
 
 const FILES = [
   './',
