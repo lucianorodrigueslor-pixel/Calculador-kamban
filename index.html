@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="pt-BR">
 <head>
@@ -18,6 +17,8 @@ header{background:linear-gradient(135deg,#061f40,#0865bd);color:white;padding:22
 .brand img{width:62px;height:62px}
 .brand h1{font-size:23px;line-height:1.1;margin:0}
 .brand p{margin:5px 0 0;color:#dcecff;font-size:13px}
+.brand{position:relative}.calc-launch{margin-left:auto;background:#fff;color:#073b78;border:2px solid #ffbd19;border-radius:12px;width:52px;height:52px;padding:8px;font-size:24px;flex-shrink:0}
+.calc-overlay{display:none;position:fixed;inset:0;background:#07182dcc;z-index:9999;align-items:center;justify-content:center;padding:18px}.calc-overlay.open{display:flex}.calc-window{width:min(360px,100%);background:#e7edf4;border-radius:22px;padding:14px;box-shadow:0 18px 50px #0008}.calc-top{display:flex;align-items:center;justify-content:space-between;background:#092e59;color:white;border-radius:14px;padding:10px 12px;margin-bottom:10px}.calc-close{background:#d83b3b;color:white;border-radius:10px;padding:8px 12px;font-size:18px}.calc-display{background:#061f40;color:white;border-radius:14px;padding:16px 12px;text-align:right;font-size:32px;font-weight:800;overflow-wrap:anywhere;min-height:68px;margin-bottom:12px}.calc-keys{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.calc-keys button{padding:15px 5px;font-size:20px;background:white;color:#153451}.calc-keys button.op{background:#0866bf;color:white}.calc-keys button.eq{background:#16864a;color:white}.calc-keys button.clear{background:#dce5ef;color:#12375f}
 main{max-width:760px;margin:16px auto;padding:0 12px 36px}
 .card{background:white;border:1px solid #d8e1ec;border-radius:16px;padding:16px;margin:12px 0;box-shadow:0 3px 12px #18375b0b}
 h2{font-size:18px;margin:0 0 12px;color:var(--navy)}
@@ -50,6 +51,7 @@ button{border:0;border-radius:12px;padding:14px 16px;font-size:16px;font-weight:
 <h1>Calculador Kamban</h1>
 <p>Caixas • Peças • Metas • Relatório</p>
 </div>
+<button class="calc-launch" id="calc-launch" aria-label="Abrir calculadora" title="Calculadora">🧮</button>
 </div>
 </header>
 <main>
@@ -100,6 +102,7 @@ button{border:0;border-radius:12px;padding:14px 16px;font-size:16px;font-weight:
 
 <section class="card">
 <h2>Relatório para WhatsApp</h2>
+<div class="field"><label for="greeting">Saudação do relatório</label><input id="greeting" value="Boa tarde a todos" placeholder="Digite a saudação"></div>
 <div class="report" id="report"></div>
 <button class="primary" id="copy">Copiar relatório para WhatsApp</button>
 <button class="secondary" id="share">Compartilhar relatório</button>
@@ -111,6 +114,20 @@ button{border:0;border-radius:12px;padding:14px 16px;font-size:16px;font-weight:
 <p class="muted">Depois que esta pasta estiver publicada em um endereço HTTPS, abra o endereço no Chrome do Android, toque no menu ⋮ e escolha “Instalar app” ou “Adicionar à tela inicial”. O pacote inclui os arquivos necessários para isso.</p>
 </section>
 </main>
+
+<div class="calc-overlay" id="calc-overlay" aria-hidden="true">
+ <div class="calc-window" role="dialog" aria-modal="true" aria-label="Calculadora auxiliar">
+  <div class="calc-top"><strong>Calculadora</strong><button class="calc-close" id="calc-close" aria-label="Fechar">✕</button></div>
+  <div class="calc-display" id="calc-display">0</div>
+  <div class="calc-keys" id="calc-keys">
+   <button class="clear" data-key="AC">AC</button><button class="clear" data-key="sign">±</button><button class="clear" data-key="%">%</button><button class="op" data-key="÷">÷</button>
+   <button data-key="7">7</button><button data-key="8">8</button><button data-key="9">9</button><button class="op" data-key="×">×</button>
+   <button data-key="4">4</button><button data-key="5">5</button><button data-key="6">6</button><button class="op" data-key="−">−</button>
+   <button data-key="1">1</button><button data-key="2">2</button><button data-key="3">3</button><button class="op" data-key="+">+</button>
+   <button data-key="0">0</button><button data-key=",">,</button><button class="eq" data-key="=">=</button><button class="op" data-key="back">⌫</button>
+  </div>
+ </div>
+</div>
 
 <script>
 const items=[
@@ -142,7 +159,7 @@ function build(){
  </div>
  <div class="grid">
  ${(x.id==="b"
-  ? [["Peças usinadas – 450 peças","u450"],["Peças usinadas – 350 peças","u350"],["Caixas para usinar","p"],["Caixas Kamban","k"]]
+  ? [["Caixas combinadas – 450 peças","u450"],["Caixas combinadas – 350 peças","u350"],["Caixas para usinar","p"],["Caixas Kamban","k"]]
   : [["Caixas usinadas","u"],["Caixas para usinar","p"],["Caixas Kamban","k"]]
  ).map(([label,s])=>`
  <div class="field">
@@ -205,7 +222,7 @@ function calculate(){
  ].join(NL)).join(NL+NL);
 
  const report=[
-  "*Boa tarde a todos*",
+  `*${$("greeting").value || ""}*`,
   "",
   `*${$("date").value}*`,
   "",
@@ -289,6 +306,22 @@ $("share").addEventListener("click",async()=>{
 });
 
 calculate();
+
+// Calculadora auxiliar em janela sobreposta, independente dos dados de produção.
+(()=>{
+ const overlay=$("calc-overlay"),display=$("calc-display");let cur="0",savedNum=null,operator=null,resetNext=false;
+ const render=()=>display.textContent=cur;
+ const clean=()=>{cur="0";savedNum=null;operator=null;resetNext=false;render()};
+ const input=n=>{if(cur==="Erro")clean();if(resetNext){cur=n===","?"0,":n;resetNext=false}else if(n===","){if(!cur.includes(","))cur+=" ,".replace(" ","")}else cur=cur==="0"?n:cur+n;render()};
+ const doOp=o=>{savedNum=Number(cur.replace(",","."));operator=o;resetNext=true};
+ const equal=()=>{if(savedNum===null||!operator)return;const b=Number(cur.replace(",",".")),a=savedNum;let r=operator==="+"?a+b:operator==="−"?a-b:operator==="×"?a*b:operator==="÷"?(b===0?NaN:a/b):NaN;cur=Number.isFinite(r)?String(Number(r.toFixed(9))).replace(".",","):"Erro";savedNum=null;operator=null;resetNext=true;render()};
+ const pct=()=>{cur=String(Number((Number(cur.replace(",","."))/100).toFixed(9))).replace(".",",");resetNext=true;render()};
+ const close=()=>{overlay.classList.remove("open");overlay.setAttribute("aria-hidden","true")};
+ $("calc-launch").addEventListener("click",()=>{overlay.classList.add("open");overlay.setAttribute("aria-hidden","false")});
+ $("calc-close").addEventListener("click",close);overlay.addEventListener("click",e=>{if(e.target===overlay)close()});
+ $("calc-keys").addEventListener("click",e=>{const b=e.target.closest("button[data-key]");if(!b)return;const k=b.dataset.key;if(/^\d$/.test(k)||k===","){input(k)}else if(k==="AC")clean();else if(k==="sign"){if(cur!=="0")cur=cur.startsWith("-")?cur.slice(1):"-"+cur;render()}else if(k==="%")pct();else if(k==="back"){cur=resetNext?"0":(cur.length>1?cur.slice(0,-1):"0");render()}else if(["+","−","×","÷"].includes(k))doOp(k);else if(k==="=")equal()});
+ document.addEventListener("keydown",e=>{if(!overlay.classList.contains("open"))return;if(e.key==="Escape")close();else if(/^\d$/.test(e.key))input(e.key);else if(e.key===".")input(",");else if(e.key==="Backspace"){cur=cur.length>1?cur.slice(0,-1):"0";render()}else if(e.key==="Enter"||e.key==="=")equal();else if(e.key==="+")doOp("+");else if(e.key==="-")doOp("−");else if(e.key==="*")doOp("×");else if(e.key==="/")doOp("÷")});
+})();
 
 if("serviceWorker" in navigator && location.protocol.startsWith("http")){
  navigator.serviceWorker.register("./sw.js").catch(()=>{});
