@@ -53,6 +53,9 @@ h3{font-size:17px;margin:0}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .field{display:flex;flex-direction:column;gap:5px;margin:8px 0}
 .field label{font-size:13px;font-weight:700;color:#43536a}
+.field-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.field-chip{font-size:12px;font-weight:700;background:#e7f1ff;color:#0755a4;border-radius:30px;padding:6px 9px;white-space:nowrap}
+.full-field{grid-column:1/-1}
 .field input{
 width:100%;
 padding:12px;
@@ -271,11 +274,38 @@ $("items").innerHTML=items.map(x=>`
 
 <div class="itemhead">
 <h3>${x.name}</h3>
-<span class="chip">${x.unit} peças por caixa</span>
+${x.id==="b" ? "" : `<span class="chip">${x.unit} peças por caixa</span>`}
 </div>
 
 <div class="grid">
 
+${x.id==="b" ? `
+<div class="field full-field">
+<div class="field-top">
+<label for="bu350">Peças usinadas</label>
+<span class="field-chip">350 peças por caixa</span>
+</div>
+<input id="bu350" type="number" min="0" step="1" value="0" inputmode="numeric" placeholder="Nº de caixas">
+</div>
+
+<div class="field full-field">
+<div class="field-top">
+<label for="bu450">Peças usinadas</label>
+<span class="field-chip">450 peças por caixa</span>
+</div>
+<input id="bu450" type="number" min="0" step="1" value="0" inputmode="numeric" placeholder="Nº de caixas">
+</div>
+
+<div class="field">
+<label for="bp">Peças para usinar</label>
+<input id="bp" type="number" min="0" step="1" value="0" inputmode="numeric" placeholder="Nº de caixas">
+</div>
+
+<div class="field">
+<label for="bk">Peças Kanban</label>
+<input id="bk" type="number" min="0" step="1" value="0" inputmode="numeric" placeholder="Nº de caixas">
+</div>
+` : `
 ${[
 ["Caixas usinadas","u"],
 ["Caixas para usinar","p"],
@@ -293,6 +323,7 @@ inputmode="numeric"
 placeholder="Nº de caixas">
 </div>
 `).join("")}
+`}
 
 </div>
 
@@ -354,7 +385,9 @@ let total=0;
 
 const detail=items.map(x=>{
 
-const u=val(x.id+"u")*x.unit;
+const u=x.id==="b"
+? val("bu350")*350 + val("bu450")*450
+: val(x.id+"u")*x.unit;
 const p=val(x.id+"p")*x.unit;
 const k=val(x.id+"k")*x.unit;
 
