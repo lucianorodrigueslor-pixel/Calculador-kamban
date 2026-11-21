@@ -58,6 +58,10 @@ button{border:0;border-radius:12px;padding:14px 16px;font-size:16px;font-weight:
 <main>
 <section class="card">
 <h2>Levantamento</h2>
+<div class="field">
+<label for="greeting">Saudação do relatório</label>
+<input id="greeting" value="Bom dia a todos" placeholder="Digite a saudação">
+</div>
 <div class="grid">
 <div class="field">
 <label for="date">Data do levantamento</label>
@@ -103,7 +107,6 @@ button{border:0;border-radius:12px;padding:14px 16px;font-size:16px;font-weight:
 
 <section class="card">
 <h2>Relatório para WhatsApp</h2>
-<div class="field"><label for="greeting">Saudação do relatório</label><input id="greeting" value="Boa tarde a todos" placeholder="Digite a saudação"></div>
 <div class="report" id="report"></div>
 <button class="primary" id="copy">Copiar relatório para WhatsApp</button>
 <button class="secondary" id="share">Compartilhar relatório</button>
