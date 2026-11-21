@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="pt-BR">
 <head>
@@ -18,7 +19,7 @@ header{background:linear-gradient(135deg,#061f40,#0865bd);color:white;padding:22
 .brand h1{font-size:23px;line-height:1.1;margin:0}
 .brand p{margin:5px 0 0;color:#dcecff;font-size:13px}
 .brand{position:relative}.calc-launch{margin-left:auto;background:#fff;color:#073b78;border:2px solid #ffbd19;border-radius:12px;width:52px;height:52px;padding:8px;font-size:24px;flex-shrink:0}
-.calc-overlay{display:none;position:fixed;inset:0;background:#07182dcc;z-index:9999;align-items:center;justify-content:center;padding:18px}.calc-overlay.open{display:flex}.calc-window{width:min(360px,100%);background:#e7edf4;border-radius:22px;padding:14px;box-shadow:0 18px 50px #0008}.calc-top{display:flex;align-items:center;justify-content:space-between;background:#092e59;color:white;border-radius:14px;padding:10px 12px;margin-bottom:10px}.calc-close{background:#d83b3b;color:white;border-radius:10px;padding:8px 12px;font-size:18px}.calc-display{background:#061f40;color:white;border-radius:14px;padding:16px 12px;text-align:right;font-size:32px;font-weight:800;overflow-wrap:anywhere;min-height:68px;margin-bottom:12px}.calc-keys{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.calc-keys button{padding:15px 5px;font-size:20px;background:white;color:#153451}.calc-keys button.op{background:#0866bf;color:white}.calc-keys button.eq{background:#16864a;color:white}.calc-keys button.clear{background:#dce5ef;color:#12375f}
+.calc-overlay{display:none;position:fixed;inset:0;background:#07182dcc;z-index:9999;align-items:center;justify-content:center;padding:18px}.calc-overlay.open{display:flex}.calc-window{width:min(360px,100%);background:#e7edf4;border-radius:22px;padding:14px;box-shadow:0 18px 50px #0008}.calc-top{display:flex;align-items:center;justify-content:space-between;background:#092e59;color:white;border-radius:14px;padding:10px 12px;margin-bottom:10px}.calc-close{background:#d83b3b;color:white;border-radius:10px;padding:8px 12px;font-size:18px}.calc-display{background:#061f40;color:white;border-radius:14px;padding:12px;text-align:right;font-size:32px;font-weight:800;overflow-wrap:anywhere;min-height:68px;margin-bottom:12px}.calc-expression{display:block;min-height:22px;font-size:15px;color:#a9c8e9;font-weight:600;margin-bottom:4px}.calc-keys{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.calc-keys button{padding:15px 5px;font-size:20px;background:white;color:#153451}.calc-keys button.op{background:#0866bf;color:white}.calc-keys button.eq{background:#16864a;color:white}.calc-keys button.clear{background:#dce5ef;color:#12375f}
 main{max-width:760px;margin:16px auto;padding:0 12px 36px}
 .card{background:white;border:1px solid #d8e1ec;border-radius:16px;padding:16px;margin:12px 0;box-shadow:0 3px 12px #18375b0b}
 h2{font-size:18px;margin:0 0 12px;color:var(--navy)}
@@ -118,7 +119,7 @@ button{border:0;border-radius:12px;padding:14px 16px;font-size:16px;font-weight:
 <div class="calc-overlay" id="calc-overlay" aria-hidden="true">
  <div class="calc-window" role="dialog" aria-modal="true" aria-label="Calculadora auxiliar">
   <div class="calc-top"><strong>Calculadora</strong><button class="calc-close" id="calc-close" aria-label="Fechar">✕</button></div>
-  <div class="calc-display" id="calc-display">0</div>
+  <div class="calc-display"><span class="calc-expression" id="calc-expression"></span><span id="calc-display">0</span></div>
   <div class="calc-keys" id="calc-keys">
    <button class="clear" data-key="AC">AC</button><button class="clear" data-key="sign">±</button><button class="clear" data-key="%">%</button><button class="op" data-key="÷">÷</button>
    <button data-key="7">7</button><button data-key="8">8</button><button data-key="9">9</button><button class="op" data-key="×">×</button>
@@ -159,7 +160,7 @@ function build(){
  </div>
  <div class="grid">
  ${(x.id==="b"
-  ? [["Caixas combinadas – 450 peças","u450"],["Caixas combinadas – 350 peças","u350"],["Caixas para usinar","p"],["Caixas Kamban","k"]]
+  ? [["Caixas usinadas – 450 peças","u450"],["Caixas usinadas – 350 peças","u350"],["Caixas para usinar","p"],["Caixas Kamban","k"]]
   : [["Caixas usinadas","u"],["Caixas para usinar","p"],["Caixas Kamban","k"]]
  ).map(([label,s])=>`
  <div class="field">
@@ -309,11 +310,11 @@ calculate();
 
 // Calculadora auxiliar em janela sobreposta, independente dos dados de produção.
 (()=>{
- const overlay=$("calc-overlay"),display=$("calc-display");let cur="0",savedNum=null,operator=null,resetNext=false;
- const render=()=>display.textContent=cur;
+ const overlay=$("calc-overlay"),display=$("calc-display"),expression=$("calc-expression");let cur="0",savedNum=null,operator=null,resetNext=false;
+ const render=()=>{display.textContent=cur;expression.textContent=(savedNum!==null&&operator)?String(savedNum).replace(".",",")+" "+operator+(resetNext?"":" "+cur):""};
  const clean=()=>{cur="0";savedNum=null;operator=null;resetNext=false;render()};
  const input=n=>{if(cur==="Erro")clean();if(resetNext){cur=n===","?"0,":n;resetNext=false}else if(n===","){if(!cur.includes(","))cur+=" ,".replace(" ","")}else cur=cur==="0"?n:cur+n;render()};
- const doOp=o=>{savedNum=Number(cur.replace(",","."));operator=o;resetNext=true};
+ const doOp=o=>{savedNum=Number(cur.replace(",","."));operator=o;resetNext=true;render()};
  const equal=()=>{if(savedNum===null||!operator)return;const b=Number(cur.replace(",",".")),a=savedNum;let r=operator==="+"?a+b:operator==="−"?a-b:operator==="×"?a*b:operator==="÷"?(b===0?NaN:a/b):NaN;cur=Number.isFinite(r)?String(Number(r.toFixed(9))).replace(".",","):"Erro";savedNum=null;operator=null;resetNext=true;render()};
  const pct=()=>{cur=String(Number((Number(cur.replace(",","."))/100).toFixed(9))).replace(".",",");resetNext=true;render()};
  const close=()=>{overlay.classList.remove("open");overlay.setAttribute("aria-hidden","true")};
