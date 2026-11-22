@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="pt-BR">
 <head>
@@ -52,9 +51,7 @@ button{border:0;border-radius:12px;padding:14px 16px;font-size:16px;font-weight:
 .muted{font-size:12px;color:#66768b;line-height:1.45}
 .grand{background:#092e59;color:#fff;border-radius:14px;padding:16px;display:flex;justify-content:space-between;align-items:center;font-weight:800}
 .grand strong{font-size:25px;color:#ffcf42}
-.report{white-space:pre-wrap;overflow-wrap:anywhere;background:#f7f9fc;border:1px solid #dce5ef;padding:12px;border-radius:10px;font:14px/1.5 ui-monospace,SFMono-Regular,monospace}
-
-/* Módulo Status de Fim de Turno */
+.report{white-space:pre-wrap;overflow-wrap:anywhere;background:#f7f9fc;border:1px solid #dce5ef;padding:12px;border-radius:10px;font:14px/1.7 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
 .turn-intro{background:#eaf3ff;border:1px solid #c9def5;border-radius:12px;padding:12px;margin-bottom:14px}
 .turn-step{display:none}
 .turn-step.active{display:block}
@@ -65,14 +62,22 @@ button{border:0;border-radius:12px;padding:14px 16px;font-size:16px;font-weight:
 .turn-entry textarea{flex:1;min-width:0;min-height:70px;resize:vertical;padding:11px;border:1px solid #b9c8d9;border-radius:10px;font:15px system-ui}
 .turn-remove{background:#ffe8e8;color:#a52222;padding:10px 13px}
 .turn-add{background:#e8eff7;color:#12375f;width:100%;margin-top:8px}
-.turn-machine{display:grid;grid-template-columns:100px 1fr;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid #e5ebf2}
+.turn-machine{display:grid;grid-template-columns:85px 1fr 1fr;gap:8px;align-items:center;padding:9px 0;border-bottom:1px solid #e5ebf2}
 .turn-machine strong{color:#12375f}
-.turn-machine select,.turn-observations{width:100%;padding:11px;border:1px solid #b9c8d9;border-radius:10px;background:#fff;color:#142238;font:15px system-ui}
-.turn-observations{min-height:130px;resize:vertical}
+.turn-machine input{width:100%;padding:10px;border:1px solid #b9c8d9;border-radius:10px;background:#fff;color:#142238;font:14px system-ui}
+.turn-observations{width:100%;padding:11px;border:1px solid #b9c8d9;border-radius:10px;background:#fff;color:#142238;font:15px system-ui;min-height:130px;resize:vertical}
 .turn-save{font-size:12px;color:#287447;margin-top:8px}
 .turn-actions{display:grid;gap:8px;margin-top:12px}
 .turn-back{background:#e8eff7;color:#12375f}
-@media(max-width:420px){.grid{grid-template-columns:1fr}.brand h1{font-size:21px}.turn-machine{grid-template-columns:85px 1fr}}
+.turn-home{background:#dce9f8;color:#073b78;width:100%;margin-top:8px}
+.turn-open-button{background:#f28c00;color:#fff;width:100%;margin-top:8px}
+.turn-machine input::placeholder{color:#718096}
+@media(max-width:420px){
+.grid{grid-template-columns:1fr}
+.brand h1{font-size:21px}
+.turn-machine{grid-template-columns:75px 1fr 1fr;gap:6px}
+.turn-machine input{font-size:13px;padding:9px}
+}
 </style>
 </head>
 
@@ -88,7 +93,6 @@ button{border:0;border-radius:12px;padding:14px 16px;font-size:16px;font-weight:
 </div>
 </header>
 
-<!-- CALCULADORA PRINCIPAL -->
 <div id="mainApp">
 <main>
 <section class="card">
@@ -151,7 +155,7 @@ button{border:0;border-radius:12px;padding:14px 16px;font-size:16px;font-weight:
 <section class="card">
 <h2>Status de Fim de Turno</h2>
 <p class="muted">Preencha as informações do turno, confira o relatório e compartilhe pelo WhatsApp. O módulo salva os dados automaticamente.</p>
-<button class="primary" id="openTurn">Abrir Status de Fim de Turno</button>
+<button class="turn-open-button" id="openTurn">Abrir Status de Fim de Turno</button>
 </section>
 
 <section class="card">
@@ -161,57 +165,77 @@ button{border:0;border-radius:12px;padding:14px 16px;font-size:16px;font-weight:
 </main>
 </div>
 
-<!-- MÓDULO STATUS DE FIM DE TURNO -->
 <div id="turnModule" style="display:none">
 <main>
 <section class="card">
 <h2>Status de Fim de Turno</h2>
+
 <div class="turn-intro">
-<strong id="turnProgress">Etapa 1 de 7</strong>
+<strong id="turnProgress">Etapa 1 de 8</strong>
 <p class="muted">Preencha as informações. O salvamento é automático, inclusive ao atualizar ou fechar o aplicativo.</p>
 <div class="turn-save" id="turnSaveMessage">Salvamento automático ativado.</div>
 </div>
 
 <div class="turn-step active" data-step="0">
-<div class="turn-title">1. Ferramentaria – Prioridades do PCP</div>
+<div class="turn-title">1. Saudação, turno e data</div>
+<div class="field">
+<label for="turnGreeting">Saudação</label>
+<input id="turnGreeting" placeholder="Bom dia a todos">
+</div>
+<div class="field">
+<label for="turnShift">Fechamento do turno</label>
+<select id="turnShift" class="turn-observations" style="min-height:auto">
+<option value="1° T">1° T</option>
+<option value="2° T">2° T</option>
+<option value="3° T">3° T</option>
+</select>
+</div>
+<div class="field">
+<label for="turnDate">Data</label>
+<input id="turnDate" class="turn-observations" style="min-height:auto" placeholder="DD/MM/AAAA">
+</div>
+</div>
+
+<div class="turn-step" data-step="1">
+<div class="turn-title">2. Ferramentaria – Prioridades do PCP</div>
 <p class="muted">Descreva as prioridades e serviços que precisam de atenção.</p>
 <div id="pcpList"></div>
 <button class="turn-add" id="addPcp">+ Adicionar prioridade</button>
 </div>
 
-<div class="turn-step" data-step="1">
-<div class="turn-title">2. Manutenção</div>
+<div class="turn-step" data-step="2">
+<div class="turn-title">3. Manutenção de máquinas</div>
 <p class="muted">Registre os serviços ou problemas de manutenção.</p>
 <div id="maintenanceList"></div>
 <button class="turn-add" id="addMaintenance">+ Adicionar manutenção</button>
 </div>
 
-<div class="turn-step" data-step="2">
-<div class="turn-title">3. Injeção Zamac</div>
-<p class="muted">Selecione a situação de cada máquina.</p>
+<div class="turn-step" data-step="3">
+<div class="turn-title">4. Injeção Zamac</div>
+<p class="muted">O número da máquina é fixo. Preencha o item e a condição conforme a situação do turno.</p>
 <div id="zamacList"></div>
 </div>
 
-<div class="turn-step" data-step="3">
-<div class="turn-title">4. Injeção Alumínio</div>
-<p class="muted">Selecione a situação de cada máquina.</p>
+<div class="turn-step" data-step="4">
+<div class="turn-title">5. Injeção Alumínio</div>
+<p class="muted">O número da máquina é fixo. Preencha o item e a condição conforme a situação do turno.</p>
 <div id="aluminioList"></div>
 </div>
 
-<div class="turn-step" data-step="4">
-<div class="turn-title">5. Injeção Plástico</div>
-<p class="muted">Selecione a situação de cada máquina.</p>
+<div class="turn-step" data-step="5">
+<div class="turn-title">6. Injeção Plástico</div>
+<p class="muted">O número da máquina é fixo. Preencha o item e a condição conforme a situação do turno.</p>
 <div id="plasticoList"></div>
 </div>
 
-<div class="turn-step" data-step="5">
-<div class="turn-title">6. Observações Gerais</div>
+<div class="turn-step" data-step="6">
+<div class="turn-title">7. Observações Gerais</div>
 <p class="muted">Campo opcional para informações importantes do turno.</p>
 <textarea class="turn-observations" id="turnObservations" placeholder="Digite as observações gerais..."></textarea>
 </div>
 
-<div class="turn-step" data-step="6">
-<div class="turn-title">7. Conferir relatório</div>
+<div class="turn-step" data-step="7">
+<div class="turn-title">8. Conferir relatório</div>
 <p class="muted">Confira as informações antes de compartilhar.</p>
 <div class="report" id="turnReport"></div>
 <div class="turn-actions">
@@ -221,43 +245,45 @@ button{border:0;border-radius:12px;padding:14px 16px;font-size:16px;font-weight:
 </div>
 
 <div class="turn-nav">
-<button class="turn-back" id="turnPrevious">Voltar</button>
+<button class="turn-back" id="turnPrevious">Voltar etapa</button>
 <button class="primary" id="turnNext">Próxima etapa</button>
 </div>
+
+<button class="turn-home" id="turnHome">Voltar ao início do Status</button>
 <button class="secondary" id="closeTurn">Voltar para a calculadora principal</button>
 </section>
 </main>
 </div>
 
 <div class="calc-overlay" id="calc-overlay" aria-hidden="true">
- <div class="calc-window" role="dialog" aria-modal="true" aria-label="Calculadora auxiliar">
-  <div class="calc-top"><strong>Calculadora</strong><button class="calc-close" id="calc-close" aria-label="Fechar">✕</button></div>
-  <div class="calc-display"><span class="calc-expression" id="calc-expression"></span><span id="calc-display">0</span></div>
-  <div class="calc-keys" id="calc-keys">
-   <button class="clear" data-key="AC">AC</button><button class="clear" data-key="sign">±</button><button class="clear" data-key="%">%</button><button class="op" data-key="÷">÷</button>
-   <button data-key="7">7</button><button data-key="8">8</button><button data-key="9">9</button><button class="op" data-key="×">×</button>
-   <button data-key="4">4</button><button data-key="5">5</button><button data-key="6">6</button><button class="op" data-key="−">−</button>
-   <button data-key="1">1</button><button data-key="2">2</button><button data-key="3">3</button><button class="op" data-key="+">+</button>
-   <button data-key="0">0</button><button data-key=",">,</button><button class="eq" data-key="=">=</button><button class="op" data-key="back">⌫</button>
-  </div>
- </div>
+<div class="calc-window" role="dialog" aria-modal="true" aria-label="Calculadora auxiliar">
+<div class="calc-top"><strong>Calculadora</strong><button class="calc-close" id="calc-close" aria-label="Fechar">✕</button></div>
+<div class="calc-display"><span class="calc-expression" id="calc-expression"></span><span id="calc-display">0</span></div>
+<div class="calc-keys" id="calc-keys">
+<button class="clear" data-key="AC">AC</button><button class="clear" data-key="sign">±</button><button class="clear" data-key="%">%</button><button class="op" data-key="÷">÷</button>
+<button data-key="7">7</button><button data-key="8">8</button><button data-key="9">9</button><button class="op" data-key="×">×</button>
+<button data-key="4">4</button><button data-key="5">5</button><button data-key="6">6</button><button class="op" data-key="−">−</button>
+<button data-key="1">1</button><button data-key="2">2</button><button data-key="3">3</button><button class="op" data-key="+">+</button>
+<button data-key="0">0</button><button data-key=",">,</button><button class="eq" data-key="=">=</button><button class="op" data-key="back">⌫</button>
+</div>
+</div>
 </div>
 
 <script>
 /* CALCULADORA PRINCIPAL */
 const items=[
- {name:"Tampa 506/8A",id:"t",unit:380,meta:29700},
- {name:"Corpo 505",id:"b",unit:450,meta:24250},
- {name:"Corpo 506/1",id:"c",unit:300,meta:15000},
- {name:"Corpo 504",id:"d",unit:300,meta:27500}
+{name:"Tampa 506/8A",id:"t",unit:380,meta:29700},
+{name:"Corpo 505",id:"b",unit:450,meta:24250},
+{name:"Corpo 506/1",id:"c",unit:300,meta:15000},
+{name:"Corpo 504",id:"d",unit:300,meta:27500}
 ];
 
 const program=[
- ["504","p504",11000],
- ["505","p505",9700],
- ["506","p506",5600],
- ["Especiais","esp",3000],
- ["Industriais","ind",700]
+["504","p504",11000],
+["505","p505",9700],
+["506","p506",5600],
+["Especiais","esp",3000],
+["Industriais","ind",700]
 ];
 
 const $=id=>document.getElementById(id);
@@ -266,493 +292,647 @@ const val=id=>Math.max(0,Number(String($(id).value||"0").replace(",","."))||0);
 const NL=String.fromCharCode(10);
 
 function build(){
- $("items").innerHTML=items.map(x=>`
- <section class="card" data-item="${x.id}">
- <div class="itemhead">
- <h3>${x.name}</h3>
- <span class="chip">${x.id==="b" ? "450 e 350 peças por caixa" : `${x.unit} peças por caixa`}</span>
- </div>
- <div class="grid">
- ${(x.id==="b"
-  ? [["Caixas usinadas – 450 peças","u450"],["Caixas usinadas – 350 peças","u350"],["Caixas para usinar","p"],["Caixas Kamban","k"]]
-  : [["Caixas usinadas","u"],["Caixas para usinar","p"],["Caixas Kamban","k"]]
- ).map(([label,s])=>`
- <div class="field">
- <label for="${x.id}${s}">${label}</label>
- <input id="${x.id}${s}" type="number" min="0" step="1" value="0" inputmode="numeric" placeholder="Nº de caixas">
- </div>`).join("")}
- </div>
- <div class="field">
- <label for="m${x.id}">Meta de estoque (peças)</label>
- <input id="m${x.id}" type="number" min="0" value="${x.meta}" inputmode="numeric">
- </div>
- <div class="result">
- <div class="resultrow"><span>Usinadas</span><strong id="${x.id}ru">0 peças</strong></div>
- <div class="resultrow"><span>Para usinar</span><strong id="${x.id}rp">0 peças</strong></div>
- <div class="resultrow"><span>Kamban</span><strong id="${x.id}rk">0 peças</strong></div>
- <div class="resultrow total"><span>Total do item</span><strong id="${x.id}rt">0 peças</strong></div>
- </div>
- </section>`).join("");
+$("items").innerHTML=items.map(x=>`
+<section class="card" data-item="${x.id}">
+<div class="itemhead">
+<h3>${x.name}</h3>
+<span class="chip">${x.id==="b" ? "450 e 350 peças por caixa" : `${x.unit} peças por caixa`}</span>
+</div>
+<div class="grid">
+${(x.id==="b"
+?[["Caixas usinadas – 450 peças","u450"],["Caixas usinadas – 350 peças","u350"],["Caixas para usinar","p"],["Caixas Kamban","k"]]
+:[["Caixas usinadas","u"],["Caixas para usinar","p"],["Caixas Kamban","k"]]
+).map(([label,s])=>`
+<div class="field">
+<label for="${x.id}${s}">${label}</label>
+<input id="${x.id}${s}" type="number" min="0" step="1" value="0" inputmode="numeric" placeholder="Nº de caixas">
+</div>`).join("")}
+</div>
+<div class="field">
+<label for="m${x.id}">Meta de estoque (peças)</label>
+<input id="m${x.id}" type="number" min="0" value="${x.meta}" inputmode="numeric">
+</div>
+<div class="result">
+<div class="resultrow"><span>Usinadas</span><strong id="${x.id}ru">0 peças</strong></div>
+<div class="resultrow"><span>Para usinar</span><strong id="${x.id}rp">0 peças</strong></div>
+<div class="resultrow"><span>Kamban</span><strong id="${x.id}rk">0 peças</strong></div>
+<div class="resultrow total"><span>Total do item</span><strong id="${x.id}rt">0 peças</strong></div>
+</div>
+</section>`).join("");
 
- $("program-fields").innerHTML=program.map(([label,id,n])=>`
- <div class="field">
- <label for="${id}">${label} — peças por dia</label>
- <input id="${id}" type="number" min="0" value="${n}" inputmode="numeric">
- </div>`).join("");
+$("program-fields").innerHTML=program.map(([label,id,n])=>`
+<div class="field">
+<label for="${id}">${label} — peças por dia</label>
+<input id="${id}" type="number" min="0" value="${n}" inputmode="numeric">
+</div>`).join("");
 }
 
 function calculate(){
- let total=0;
+let total=0;
 
- const detail=items.map(x=>{
-  const u=x.id==="b"
-   ? val("bu450")*450 + val("bu350")*350
-   : val(x.id+"u")*x.unit;
-  const p=val(x.id+"p")*x.unit;
-  const k=val(x.id+"k")*x.unit;
-  const t=u+p+k;
-  total+=t;
+const detail=items.map(x=>{
+const u=x.id==="b"
+?val("bu450")*450+val("bu350")*350
+:val(x.id+"u")*x.unit;
+const p=val(x.id+"p")*x.unit;
+const k=val(x.id+"k")*x.unit;
+const t=u+p+k;
+total+=t;
 
-  $(x.id+"ru").textContent=fmt(u)+" peças";
-  $(x.id+"rp").textContent=fmt(p)+" peças";
-  $(x.id+"rk").textContent=fmt(k)+" peças";
-  $(x.id+"rt").textContent=fmt(t)+" peças";
+$(x.id+"ru").textContent=fmt(u)+" peças";
+$(x.id+"rp").textContent=fmt(p)+" peças";
+$(x.id+"rk").textContent=fmt(k)+" peças";
+$(x.id+"rt").textContent=fmt(t)+" peças";
 
-  return {x,u,p,k,t,meta:val("m"+x.id)};
- });
+return{x,u,p,k,t,meta:val("m"+x.id)};
+});
 
- $("grand").textContent=fmt(total)+" peças";
+$("grand").textContent=fmt(total)+" peças";
 
- const prog=program.reduce((s,row)=>s+val(row[1]),0);
- $("program-total").textContent=fmt(prog)+" peças/dia";
+const prog=program.reduce((s,row)=>s+val(row[1]),0);
+$("program-total").textContent=fmt(prog)+" peças/dia";
 
- const itensReport=detail.map(r=>[
-  r.x.name,
-  "",
-  `${fmt(r.u)} Pç. Usinadas`,
-  `${fmt(r.p)} Pç. Para usinar`,
-  `${fmt(r.k)} Pç. Kamban`,
-  `*Total = ${fmt(r.t)} pç*`,
-  `*Meta ${fmt(r.meta)} pç - ${$("days").value} dias*`
- ].join(NL)).join(NL+NL);
+const itensReport=detail.map(r=>[
+r.x.name,
+"",
+`${fmt(r.u)} Pç. Usinadas`,
+`${fmt(r.p)} Pç. Para usinar`,
+`${fmt(r.k)} Pç. Kamban`,
+`*Total = ${fmt(r.t)} pç*`,
+`*Meta ${fmt(r.meta)} pç - ${$("days").value} dias*`
+].join(NL)).join(NL+NL);
 
- const report=[
-  `*${$("greeting").value || ""}*`,
-  "",
-  `*${$("date").value}*`,
-  "",
-  `*Levantamento realizado as ${$("hour").value} nas CUSI's*`,
-  "",
-  itensReport,
-  "",
-  `*PROGRAMAÇÃO ÁREA DO GÁS, MÊS DE ${$("month").value} - ${$("year").value}*`,
-  "",
-  `504: ${fmt(val("p504"))} Peças dia`,
-  `505: ${fmt(val("p505"))} Peças dia`,
-  `506: ${fmt(val("p506"))} Peças dia`,
-  `Especiais: ${fmt(val("esp"))} dia`,
-  `Industriais: ${fmt(val("ind"))} peças dia`,
-  "",
-  `*Total: ${fmt(prog)} pç dia*`
- ].join(NL);
+const report=[
+`*${$("greeting").value||""}*`,
+"",
+`*${$("date").value}*`,
+"",
+`*Levantamento realizado as ${$("hour").value} nas CUSI's*`,
+"",
+itensReport,
+"",
+`*PROGRAMAÇÃO ÁREA DO GÁS, MÊS DE ${$("month").value} - ${$("year").value}*`,
+"",
+`504: ${fmt(val("p504"))} Peças dia`,
+`505: ${fmt(val("p505"))} Peças dia`,
+`506: ${fmt(val("p506"))} Peças dia`,
+`Especiais: ${fmt(val("esp"))} dia`,
+`Industriais: ${fmt(val("ind"))} peças dia`,
+"",
+`*Total: ${fmt(prog)} pç dia*`
+].join(NL);
 
- $("report").textContent=report;
+$("report").textContent=report;
 
- try{
-  localStorage.setItem(
-   "calculadorKamban",
-   JSON.stringify(Object.fromEntries(
-    [...document.querySelectorAll("#mainApp input")].map(i=>[i.id,i.value])
-   ))
-  );
- }catch(e){}
+try{
+localStorage.setItem("calculadorKamban",JSON.stringify(Object.fromEntries(
+[...document.querySelectorAll("#mainApp input")].map(i=>[i.id,i.value])
+)));
+}catch(e){}
 }
 
 build();
 
 try{
- const saved=JSON.parse(localStorage.getItem("calculadorKamban")||"{}");
- for(const [id,v] of Object.entries(saved)){
-  if($(id))$(id).value=v;
- }
+const saved=JSON.parse(localStorage.getItem("calculadorKamban")||"{}");
+for(const [id,v] of Object.entries(saved)){
+if($(id))$(id).value=v;
+}
 }catch(e){}
 
 document.querySelector("#mainApp").addEventListener("input",e=>{
- if(e.target.matches("input"))calculate();
+if(e.target.matches("input"))calculate();
 });
 
 $("copy").addEventListener("click",async()=>{
- const reportText=$("report").textContent;
- try{
-  await navigator.clipboard.writeText(reportText);
-  $("copy").textContent="Relatório copiado!";
-  setTimeout(()=>$("copy").textContent="Copiar relatório para WhatsApp",2200);
- }catch(e){
-  const t=document.createElement("textarea");
-  t.value=reportText;
-  t.setAttribute("readonly","");
-  t.style.position="fixed";
-  t.style.opacity="0";
-  document.body.appendChild(t);
-  t.select();
-  document.execCommand("copy");
-  t.remove();
-  $("copy").textContent="Relatório copiado!";
-  setTimeout(()=>$("copy").textContent="Copiar relatório para WhatsApp",2200);
- }
+const reportText=$("report").textContent;
+try{
+await navigator.clipboard.writeText(reportText);
+$("copy").textContent="Relatório copiado!";
+setTimeout(()=>$("copy").textContent="Copiar relatório para WhatsApp",2200);
+}catch(e){
+const t=document.createElement("textarea");
+t.value=reportText;
+t.setAttribute("readonly","");
+t.style.position="fixed";
+t.style.opacity="0";
+document.body.appendChild(t);
+t.select();
+document.execCommand("copy");
+t.remove();
+$("copy").textContent="Relatório copiado!";
+setTimeout(()=>$("copy").textContent="Copiar relatório para WhatsApp",2200);
+}
 });
 
 $("share").addEventListener("click",async()=>{
- const reportText=$("report").textContent;
- if(navigator.share){
-  try{await navigator.share({text:reportText,title:"Relatório Calculador Kamban"});}catch(e){}
- }else{
-  try{await navigator.clipboard.writeText(reportText);alert("Relatório copiado. Cole no WhatsApp.");}
-  catch(e){alert("Não foi possível copiar automaticamente. Use o botão Copiar relatório.");}
- }
+const reportText=$("report").textContent;
+if(navigator.share){
+try{await navigator.share({text:reportText,title:"Relatório Calculador Kamban"});}catch(e){}
+}else{
+try{await navigator.clipboard.writeText(reportText);alert("Relatório copiado. Cole no WhatsApp.");}
+catch(e){alert("Não foi possível copiar automaticamente. Use o botão Copiar relatório.");}
+}
 });
 
-calculate();
-
-/* MÓDULO STATUS DE FIM DE TURNO */
+/* STATUS DE FIM DE TURNO */
 (()=>{
- const STORAGE_KEY="calculadorKambanStatusTurno";
+const STORAGE_KEY="calculadorKambanStatusTurno";
 
- const machines={
-  zamac:["18-01","18-02","18-03","20-09","20-11","20-12","20-14","20-16","30-28","30-42","30-43","50-33","50-34","50-35","70-26","160-29","160-39","160-40","160-41","160-44","160-45"],
-  aluminio:["280-31","280-32","280-34"],
-  plastico:["120-31","160-35","160-36","160-37","160-38"]
- };
+const machines={
+zamac:["18-01","18-02","18-03","20-09","20-11","20-12","20-14","20-16","30-28","30-42","30-43","50-33","50-34","50-35","70-26","160-29","160-39","160-40","160-41","160-44","160-45"],
+aluminio:["280-31","280-32","280-34"],
+plastico:["120-31","160-35","160-36","160-37","160-38"]
+};
 
- const statusOptions=[
-  "EM PRODUÇÃO",
-  "PARADA",
-  "MANUTENÇÃO",
-  "AGUARDANDO FERRAMENTARIA",
-  "AGUARDANDO PCP",
-  "PARADA PROGRAMADA"
- ];
+let state={
+greeting:"",
+shift:"1° T",
+date:"",
+pcp:[""],
+maintenance:[""],
+statuses:{},
+observations:"",
+step:0
+};
 
- let state={
-  pcp:[""],
-  maintenance:[""],
-  statuses:{},
-  observations:"",
-  step:0
- };
+function getGreeting(){
+const hour=new Date().getHours();
+if(hour>=5&&hour<12)return"Bom dia a todos";
+if(hour>=12&&hour<18)return"Boa tarde a todos";
+return"Boa noite a todos";
+}
 
- function loadState(){
-  try{
-   const saved=JSON.parse(localStorage.getItem(STORAGE_KEY)||"null");
-   if(saved && typeof saved==="object"){
-    state.pcp=Array.isArray(saved.pcp)&&saved.pcp.length?saved.pcp:[""];
-    state.maintenance=Array.isArray(saved.maintenance)&&saved.maintenance.length?saved.maintenance:[""];
-    state.statuses=saved.statuses&&typeof saved.statuses==="object"?saved.statuses:{};
-    state.observations=typeof saved.observations==="string"?saved.observations:"";
-    state.step=Number.isInteger(saved.step)?Math.max(0,Math.min(6,saved.step)):0;
-   }
-  }catch(e){
-   state={pcp:[""],maintenance:[""],statuses:{},observations:"",step:0};
-  }
- }
+function getDate(){
+const d=new Date();
+return String(d.getDate()).padStart(2,"0")+"/"+String(d.getMonth()+1).padStart(2,"0")+"/"+d.getFullYear();
+}
 
- function saveState(){
-  try{
-   localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
-   $("turnSaveMessage").textContent="✓ Dados salvos automaticamente neste aparelho.";
-  }catch(e){
-   $("turnSaveMessage").textContent="Não foi possível salvar automaticamente neste aparelho.";
-  }
- }
+/* MIGRAÇÃO E CARREGAMENTO */
+function loadState(){
+try{
+const saved=JSON.parse(localStorage.getItem(STORAGE_KEY)||"null");
+if(saved&&typeof saved==="object"){
+state.greeting=typeof saved.greeting==="string"?saved.greeting:getGreeting();
+state.shift=typeof saved.shift==="string"?saved.shift:"1° T";
+state.date=typeof saved.date==="string"?saved.date:getDate();
 
- function renderTextList(type,containerId){
-  const container=$(containerId);
-  const list=state[type];
-  container.innerHTML="";
+/* Remove prefixos antigos para evitar duplicação */
+state.pcp=Array.isArray(saved.pcp)&&saved.pcp.length
+?saved.pcp.map(v=>String(v||"").replace(/^\d+-\(PRIORIDADE\):\s*/i,""))
+:[""];
 
-  list.forEach((value,index)=>{
-   const row=document.createElement("div");
-   row.className="turn-entry";
+state.maintenance=Array.isArray(saved.maintenance)&&saved.maintenance.length
+?saved.maintenance:[""];
 
-   const area=document.createElement("textarea");
-   area.placeholder=type==="pcp"?"Descreva a prioridade do PCP...":"Descreva o serviço de manutenção...";
-   area.value=value;
-   area.setAttribute("aria-label",type==="pcp"?"Prioridade do PCP":"Manutenção");
+state.statuses=saved.statuses&&typeof saved.statuses==="object"?saved.statuses:{};
+state.observations=typeof saved.observations==="string"?saved.observations:"";
+state.step=Number.isInteger(saved.step)?Math.max(0,Math.min(7,saved.step)):0;
+}else{
+state.greeting=getGreeting();
+state.date=getDate();
+}
+}catch(e){
+state={greeting:getGreeting(),shift:"1° T",date:getDate(),pcp:[""],maintenance:[""],statuses:{},observations:"",step:0};
+}
+}
 
-   area.addEventListener("input",()=>{
-    state[type][index]=area.value;
-    saveState();
-   });
+function saveState(){
+try{
+localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
+$("turnSaveMessage").textContent="✓ Dados salvos automaticamente neste aparelho.";
+}catch(e){
+$("turnSaveMessage").textContent="Não foi possível salvar automaticamente neste aparelho.";
+}
+}
 
-   const remove=document.createElement("button");
-   remove.className="turn-remove";
-   remove.type="button";
-   remove.textContent="✕";
-   remove.title="Excluir este campo";
-   remove.addEventListener("click",()=>{
-    state[type].splice(index,1);
-    if(!state[type].length)state[type].push("");
-    renderTextList(type,containerId);
-    saveState();
-   });
+function pcpPrefix(index){
+return(index+1)+"-(PRIORIDADE): ";
+}
 
-   row.append(area,remove);
-   container.appendChild(row);
-  });
- }
+/* LISTAS EDITÁVEIS */
+function renderTextList(type,containerId){
+const container=$(containerId);
+const list=state[type];
+container.innerHTML="";
 
- function renderMachines(type,containerId){
-  const container=$(containerId);
-  container.innerHTML="";
+list.forEach((value,index)=>{
+const row=document.createElement("div");
+row.className="turn-entry";
 
-  machines[type].forEach(machine=>{
-   const row=document.createElement("div");
-   row.className="turn-machine";
+const area=document.createElement("textarea");
 
-   const label=document.createElement("strong");
-   label.textContent=machine;
+if(type==="pcp"){
+area.placeholder=pcpPrefix(index)+"Digite a prioridade...";
+area.value=String(value||"").replace(/^\d+-\(PRIORIDADE\):\s*/i,"");
+}else{
+area.placeholder="Descreva o serviço de manutenção...";
+area.value=value||"";
+}
 
-   const select=document.createElement("select");
-   select.setAttribute("aria-label","Status da máquina "+machine);
+area.setAttribute("aria-label",type==="pcp"?"Prioridade "+(index+1):"Manutenção");
 
-   const empty=document.createElement("option");
-   empty.value="";
-   empty.textContent="Selecione o status";
-   select.appendChild(empty);
+area.addEventListener("input",()=>{
+state[type][index]=area.value;
+saveState();
+});
 
-   statusOptions.forEach(status=>{
-    const option=document.createElement("option");
-    option.value=status;
-    option.textContent=status;
-    select.appendChild(option);
-   });
+const remove=document.createElement("button");
+remove.className="turn-remove";
+remove.type="button";
+remove.textContent="✕";
+remove.title="Excluir este campo";
 
-   select.value=state.statuses[machine]||"";
-   select.addEventListener("change",()=>{
-    state.statuses[machine]=select.value;
-    saveState();
-   });
+remove.addEventListener("click",()=>{
+state[type].splice(index,1);
+if(!state[type].length)state[type].push("");
+renderTextList(type,containerId);
+saveState();
+});
 
-   row.append(label,select);
-   container.appendChild(row);
-  });
- }
+row.append(area,remove);
+container.appendChild(row);
+});
+}
 
- function renderAll(){
-  renderTextList("pcp","pcpList");
-  renderTextList("maintenance","maintenanceList");
-  renderMachines("zamac","zamacList");
-  renderMachines("aluminio","aluminioList");
-  renderMachines("plastico","plasticoList");
-  $("turnObservations").value=state.observations;
-  showStep(state.step);
- }
+function renderMachines(type,containerId){
+const container=$(containerId);
+container.innerHTML="";
 
- function showStep(step){
-  state.step=Math.max(0,Math.min(6,step));
-  document.querySelectorAll(".turn-step").forEach(el=>{
-   el.classList.toggle("active",Number(el.dataset.step)===state.step);
-  });
-  $("turnProgress").textContent="Etapa "+(state.step+1)+" de 7";
-  $("turnPrevious").style.visibility=state.step===0?"hidden":"visible";
-  $("turnNext").style.display=state.step===6?"none":"block";
-  if(state.step===6)buildTurnReport();
-  saveState();
- }
+machines[type].forEach(machine=>{
+const row=document.createElement("div");
+row.className="turn-machine";
 
- function addEntry(type,containerId){
-  state[type].push("");
-  renderTextList(type,containerId);
-  saveState();
- }
+const label=document.createElement("strong");
+label.textContent=machine;
 
- $("addPcp").addEventListener("click",()=>addEntry("pcp","pcpList"));
- $("addMaintenance").addEventListener("click",()=>addEntry("maintenance","maintenanceList"));
+const itemInput=document.createElement("input");
+itemInput.placeholder="Item";
+itemInput.setAttribute("aria-label","Item da máquina "+machine);
 
- $("turnObservations").addEventListener("input",()=>{
-  state.observations=$("turnObservations").value;
-  saveState();
- });
+const conditionInput=document.createElement("input");
+conditionInput.placeholder="Condição";
+conditionInput.setAttribute("aria-label","Condição da máquina "+machine);
 
- function machineReport(title,type){
-  const lines=machines[type].map(machine=>{
-   const status=state.statuses[machine]||"PARADA PROGRAMADA";
-   return machine+": "+status;
-  });
-  return title+NL+lines.join(NL);
- }
+const saved=state.statuses[machine];
 
- function textListReport(title,list){
-  const filled=list.map(v=>String(v||"").trim()).filter(Boolean);
-  return title+NL+(filled.length?filled.map((v,i)=>(i+1)+". "+v).join(NL):"Nenhuma informação registrada.");
- }
+if(saved&&typeof saved==="object"){
+itemInput.value=saved.item||"";
+conditionInput.value=saved.condition||"";
+}else if(typeof saved==="string"){
+conditionInput.value=saved;
+}
 
- function buildTurnReport(){
-  const report=[
-   "*STATUS DE FIM DE TURNO*",
-   "",
-   textListReport("FERRAMENTARIA – PRIORIDADES DO PCP",state.pcp),
-   "",
-   textListReport("MANUTENÇÃO",state.maintenance),
-   "",
-   machineReport("INJEÇÃO ZAMAC","zamac"),
-   "",
-   machineReport("INJEÇÃO ALUMÍNIO","aluminio"),
-   "",
-   machineReport("INJEÇÃO PLÁSTICO","plastico"),
-   "",
-   "OBSERVAÇÕES GERAIS",
-   state.observations.trim()||"Nenhuma observação."
-  ].join(NL);
+itemInput.addEventListener("input",()=>{
+state.statuses[machine]={item:itemInput.value,condition:conditionInput.value};
+saveState();
+});
 
-  $("turnReport").textContent=report;
-  return report;
- }
+conditionInput.addEventListener("input",()=>{
+state.statuses[machine]={item:itemInput.value,condition:conditionInput.value};
+saveState();
+});
 
- $("turnPrevious").addEventListener("click",()=>{
-  if(state.step>0)showStep(state.step-1);
- });
+row.append(label,itemInput,conditionInput);
+container.appendChild(row);
+});
+}
 
- $("turnNext").addEventListener("click",()=>{
-  if(state.step<6)showStep(state.step+1);
- });
+function renderAll(){
+$("turnGreeting").value=state.greeting;
+$("turnShift").value=state.shift;
+$("turnDate").value=state.date;
 
- $("openTurn").addEventListener("click",()=>{
-  $("mainApp").style.display="none";
-  $("turnModule").style.display="block";
-  renderAll();
-  window.scrollTo(0,0);
- });
+renderTextList("pcp","pcpList");
+renderTextList("maintenance","maintenanceList");
+renderMachines("zamac","zamacList");
+renderMachines("aluminio","aluminioList");
+renderMachines("plastico","plasticoList");
 
- $("closeTurn").addEventListener("click",()=>{
-  saveState();
-  $("turnModule").style.display="none";
-  $("mainApp").style.display="block";
-  window.scrollTo(0,0);
- });
+$("turnObservations").value=state.observations;
+showStep(state.step);
+}
 
- async function copyTurnReport(){
-  const report=buildTurnReport();
-  try{
-   await navigator.clipboard.writeText(report);
-   $("copyTurn").textContent="Relatório copiado!";
-   setTimeout(()=>$("copyTurn").textContent="Copiar relatório do turno",2200);
-  }catch(e){
-   const area=document.createElement("textarea");
-   area.value=report;
-   area.setAttribute("readonly","");
-   area.style.position="fixed";
-   area.style.opacity="0";
-   document.body.appendChild(area);
-   area.select();
-   document.execCommand("copy");
-   area.remove();
-   $("copyTurn").textContent="Relatório copiado!";
-   setTimeout(()=>$("copyTurn").textContent="Copiar relatório do turno",2200);
-  }
- }
+function showStep(step){
+state.step=Math.max(0,Math.min(7,step));
 
- $("copyTurn").addEventListener("click",copyTurnReport);
+document.querySelectorAll(".turn-step").forEach(el=>{
+el.classList.toggle("active",Number(el.dataset.step)===state.step);
+});
 
- $("shareTurn").addEventListener("click",async()=>{
-  const report=buildTurnReport();
-  if(navigator.share){
-   try{
-    await navigator.share({title:"Status de Fim de Turno",text:report});
-   }catch(e){}
-  }else{
-   try{
-    await navigator.clipboard.writeText(report);
-    alert("Relatório copiado. Agora é só colar no WhatsApp.");
-   }catch(e){
-    alert("Não foi possível compartilhar automaticamente. Use o botão Copiar relatório do turno.");
-   }
-  }
- });
+$("turnProgress").textContent="Etapa "+(state.step+1)+" de 8";
+$("turnPrevious").style.visibility=state.step===0?"hidden":"visible";
+$("turnNext").style.display=state.step===7?"none":"block";
 
- loadState();
- renderAll();
+if(state.step===7)buildTurnReport();
+
+saveState();
+}
+
+function addEntry(type,containerId){
+state[type].push("");
+renderTextList(type,containerId);
+saveState();
+}
+
+$("addPcp").addEventListener("click",()=>addEntry("pcp","pcpList"));
+$("addMaintenance").addEventListener("click",()=>addEntry("maintenance","maintenanceList"));
+
+$("turnGreeting").addEventListener("input",()=>{
+state.greeting=$("turnGreeting").value;
+saveState();
+});
+
+$("turnShift").addEventListener("change",()=>{
+state.shift=$("turnShift").value;
+saveState();
+});
+
+$("turnDate").addEventListener("input",()=>{
+state.date=$("turnDate").value;
+saveState();
+});
+
+$("turnObservations").addEventListener("input",()=>{
+state.observations=$("turnObservations").value;
+saveState();
+});
+
+/* RELATÓRIO DAS MÁQUINAS */
+function machineReport(title,type){
+const lines=[];
+let hasContent=false;
+
+machines[type].forEach(machine=>{
+const saved=state.statuses[machine];
+let item="",condition="";
+
+if(saved&&typeof saved==="object"){
+item=String(saved.item||"").trim();
+condition=String(saved.condition||"").trim();
+}else if(typeof saved==="string"){
+condition=saved.trim();
+}
+
+if(item||condition){
+hasContent=true;
+let line=machine+" _ ";
+
+if(item)line+="*"+item+"*";
+if(item&&condition)line+=" _ ";
+if(condition)line+=condition;
+
+lines.push(line);
+}
+});
+
+if(!hasContent){
+return"*"+title+"*"+NL+NL+"PARADA PROGRAMADA";
+}
+
+return"*"+title+"*"+NL+NL+lines.join(NL+NL);
+}
+
+/* RELATÓRIO DA FERRAMENTARIA */
+function pcpReport(){
+const filled=state.pcp
+.map(v=>String(v||"").replace(/^\d+-\(PRIORIDADE\):\s*/i,"").trim())
+.filter(Boolean);
+
+if(!filled.length){
+return"*Ferramentaria manutenção de moldes itens que estão no processo de injeção crítico PCP*"+NL+NL+"SEM PRIORIDADES NA FERRAMENTARIA";
+}
+
+const numbered=filled.map((v,index)=>pcpPrefix(index)+v);
+
+return"*Ferramentaria manutenção de moldes itens que estão no processo de injeção crítico PCP*"+NL+NL+numbered.join(NL+NL);
+}
+
+function textListReport(title,list,emptyText){
+const filled=list.map(v=>String(v||"").trim()).filter(Boolean);
+
+if(!filled.length){
+return"*"+title+"*"+NL+NL+emptyText;
+}
+
+return"*"+title+"*"+NL+NL+filled.join(NL+NL);
+}
+
+/* MONTAGEM FINAL */
+function buildTurnReport(){
+const sections=[];
+
+const greeting=state.greeting.trim()||getGreeting();
+
+sections.push("*"+greeting+"*");
+sections.push("*Fechamento do "+state.shift+"*");
+sections.push("*"+state.date+"*");
+
+sections.push(pcpReport());
+
+sections.push(
+textListReport(
+"Manutenção de máquinas",
+state.maintenance,
+"SEM PRIORIDADE NA MANUTENÇÃO"
+)
+);
+
+sections.push(machineReport("INJEÇÃO ZAMAC","zamac"));
+sections.push(machineReport("INJETORAS DE ALUMÍNIO","aluminio"));
+sections.push(machineReport("INJETORAS DE PLÁSTICO","plastico"));
+
+const obs=state.observations.trim();
+if(obs){
+sections.push("*OBSERVAÇÕES GERAIS*"+NL+NL+obs);
+}
+
+const report=sections.join(NL+NL);
+$("turnReport").textContent=report;
+return report;
+}
+
+/* NAVEGAÇÃO */
+$("turnPrevious").addEventListener("click",()=>{
+if(state.step>0)showStep(state.step-1);
+});
+
+$("turnNext").addEventListener("click",()=>{
+if(state.step<7)showStep(state.step+1);
+});
+
+$("turnHome").addEventListener("click",()=>{
+showStep(0);
+window.scrollTo(0,0);
+});
+
+$("openTurn").addEventListener("click",()=>{
+$("mainApp").style.display="none";
+$("turnModule").style.display="block";
+renderAll();
+window.scrollTo(0,0);
+});
+
+$("closeTurn").addEventListener("click",()=>{
+saveState();
+$("turnModule").style.display="none";
+$("mainApp").style.display="block";
+window.scrollTo(0,0);
+});
+
+/* COPIAR RELATÓRIO */
+async function copyTurnReport(){
+const report=buildTurnReport();
+
+try{
+await navigator.clipboard.writeText(report);
+$("copyTurn").textContent="Relatório copiado!";
+setTimeout(()=>$("copyTurn").textContent="Copiar relatório do turno",2200);
+}catch(e){
+const area=document.createElement("textarea");
+area.value=report;
+area.setAttribute("readonly","");
+area.style.position="fixed";
+area.style.opacity="0";
+document.body.appendChild(area);
+area.select();
+document.execCommand("copy");
+area.remove();
+$("copyTurn").textContent="Relatório copiado!";
+setTimeout(()=>$("copyTurn").textContent="Copiar relatório do turno",2200);
+}
+}
+
+$("copyTurn").addEventListener("click",copyTurnReport);
+
+/* COMPARTILHAR */
+$("shareTurn").addEventListener("click",async()=>{
+const report=buildTurnReport();
+
+if(navigator.share){
+try{
+await navigator.share({title:"Status de Fim de Turno",text:report});
+}catch(e){}
+}else{
+try{
+await navigator.clipboard.writeText(report);
+alert("Relatório copiado. Agora é só colar no WhatsApp.");
+}catch(e){
+alert("Não foi possível compartilhar automaticamente. Use o botão Copiar relatório do turno.");
+}
+}
+});
+
+loadState();
+renderAll();
 })();
 
 /* CALCULADORA AUXILIAR */
 (()=>{
- const overlay=$("calc-overlay"),display=$("calc-display"),expression=$("calc-expression");
- let cur="0",savedNum=null,operator=null,resetNext=false;
+const overlay=$("calc-overlay"),display=$("calc-display"),expression=$("calc-expression");
+let cur="0",savedNum=null,operator=null,resetNext=false;
 
- const render=()=>{
-  display.textContent=cur;
-  expression.textContent=(savedNum!==null&&operator)?String(savedNum).replace(".",",")+" "+operator+(resetNext?"":" "+cur):"";
- };
+const render=()=>{
+display.textContent=cur;
+expression.textContent=(savedNum!==null&&operator)
+?String(savedNum).replace(".",",")+" "+operator+(resetNext?"":" "+cur)
+:"";
+};
 
- const clean=()=>{
-  cur="0";savedNum=null;operator=null;resetNext=false;render();
- };
+const clean=()=>{
+cur="0";savedNum=null;operator=null;resetNext=false;render();
+};
 
- const input=n=>{
-  if(cur==="Erro")clean();
-  if(resetNext){cur=n===","?"0,":n;resetNext=false}
-  else if(n===","){if(!cur.includes(","))cur+=" ,".replace(" ","")}
-  else cur=cur==="0"?n:cur+n;
-  render();
- };
+const input=n=>{
+if(cur==="Erro")clean();
 
- const doOp=o=>{savedNum=Number(cur.replace(",","."));operator=o;resetNext=true;render()};
+if(resetNext){
+cur=n===","?"0,":n;
+resetNext=false;
+}else if(n===","){
+if(!cur.includes(","))cur+=" ,".replace(" ","");
+}else{
+cur=cur==="0"?n:cur+n;
+}
+render();
+};
 
- const equal=()=>{
-  if(savedNum===null||!operator)return;
-  const b=Number(cur.replace(",",".")),a=savedNum;
-  let r=operator==="+"?a+b:operator==="−"?a-b:operator==="×"?a*b:operator==="÷"?(b===0?NaN:a/b):NaN;
-  cur=Number.isFinite(r)?String(Number(r.toFixed(9))).replace(".",","):"Erro";
-  savedNum=null;operator=null;resetNext=true;render();
- };
+const doOp=o=>{
+savedNum=Number(cur.replace(",","."));
+operator=o;
+resetNext=true;
+render();
+};
 
- const pct=()=>{
-  cur=String(Number((Number(cur.replace(",","."))/100).toFixed(9))).replace(".",",");
-  resetNext=true;render();
- };
+const equal=()=>{
+if(savedNum===null||!operator)return;
 
- const close=()=>{
-  overlay.classList.remove("open");
-  overlay.setAttribute("aria-hidden","true");
- };
+const b=Number(cur.replace(",","."));
+const a=savedNum;
 
- $("calc-launch").addEventListener("click",()=>{
-  overlay.classList.add("open");
-  overlay.setAttribute("aria-hidden","false");
- });
+let r=operator==="+"?a+b:
+operator==="−"?a-b:
+operator==="×"?a*b:
+operator==="÷"?(b===0?NaN:a/b):NaN;
 
- $("calc-close").addEventListener("click",close);
- overlay.addEventListener("click",e=>{if(e.target===overlay)close()});
+cur=Number.isFinite(r)?String(Number(r.toFixed(9))).replace(".",","):"Erro";
+savedNum=null;
+operator=null;
+resetNext=true;
+render();
+};
 
- $("calc-keys").addEventListener("click",e=>{
-  const b=e.target.closest("button[data-key]");
-  if(!b)return;
-  const k=b.dataset.key;
-  if(/^\d$/.test(k)||k===","){input(k)}
-  else if(k==="AC")clean();
-  else if(k==="sign"){if(cur!=="0")cur=cur.startsWith("-")?cur.slice(1):"-"+cur;render()}
-  else if(k==="%")pct();
-  else if(k==="back"){cur=resetNext?"0":(cur.length>1?cur.slice(0,-1):"0");render()}
-  else if(["+","−","×","÷"].includes(k))doOp(k);
-  else if(k==="=")equal();
- });
+const pct=()=>{
+cur=String(Number((Number(cur.replace(",","."))/100).toFixed(9))).replace(".",",");
+resetNext=true;
+render();
+};
 
- document.addEventListener("keydown",e=>{
-  if(!overlay.classList.contains("open"))return;
-  if(e.key==="Escape")close();
-  else if(/^\d$/.test(e.key))input(e.key);
-  else if(e.key===".")input(",");
-  else if(e.key==="Backspace"){cur=cur.length>1?cur.slice(0,-1):"0";render()}
-  else if(e.key==="Enter"||e.key==="=")equal();
-  else if(e.key==="+")doOp("+");
-  else if(e.key==="-")doOp("−");
-  else if(e.key==="*")doOp("×");
-  else if(e.key==="/")doOp("÷");
- });
+const close=()=>{
+overlay.classList.remove("open");
+overlay.setAttribute("aria-hidden","true");
+};
+
+$("calc-launch").addEventListener("click",()=>{
+overlay.classList.add("open");
+overlay.setAttribute("aria-hidden","false");
+});
+
+$("calc-close").addEventListener("click",close);
+overlay.addEventListener("click",e=>{if(e.target===overlay)close();});
+
+$("calc-keys").addEventListener("click",e=>{
+const b=e.target.closest("button[data-key]");
+if(!b)return;
+const k=b.dataset.key;
+
+if(/^\d$/.test(k)||k===","){input(k);}
+else if(k==="AC"){clean();}
+else if(k==="sign"){if(cur!=="0")cur=cur.startsWith("-")?cur.slice(1):"-"+cur;render();}
+else if(k==="%"){pct();}
+else if(k==="back"){cur=resetNext?"0":(cur.length>1?cur.slice(0,-1):"0");render();}
+else if(["+","−","×","÷"].includes(k)){doOp(k);}
+else if(k==="="){equal();}
+});
+
+document.addEventListener("keydown",e=>{
+if(!overlay.classList.contains("open"))return;
+if(e.key==="Escape")close();
+else if(/^\d$/.test(e.key))input(e.key);
+else if(e.key===".")input(",");
+else if(e.key==="Backspace"){cur=cur.length>1?cur.slice(0,-1):"0";render();}
+else if(e.key==="Enter"||e.key==="=")equal();
+else if(e.key==="+")doOp("+");
+else if(e.key==="-")doOp("−");
+else if(e.key==="*")doOp("×");
+else if(e.key==="/")doOp("÷");
+});
 })();
 
-if("serviceWorker" in navigator && location.protocol.startsWith("http")){
- navigator.serviceWorker.register("./sw.js").catch(()=>{});
+calculate();
+
+if("serviceWorker" in navigator&&location.protocol.startsWith("http")){
+navigator.serviceWorker.register("./sw.js").catch(()=>{});
 }
 </script>
 </body>
