@@ -62,21 +62,26 @@ button{border:0;border-radius:12px;padding:14px 16px;font-size:16px;font-weight:
 .turn-entry textarea{flex:1;min-width:0;min-height:70px;resize:vertical;padding:11px;border:1px solid #b9c8d9;border-radius:10px;font:15px system-ui}
 .turn-remove{background:#ffe8e8;color:#a52222;padding:10px 13px}
 .turn-add{background:#e8eff7;color:#12375f;width:100%;margin-top:8px}
-.turn-machine{display:grid;grid-template-columns:85px 1fr 1fr;gap:8px;align-items:center;padding:9px 0;border-bottom:1px solid #e5ebf2}
+.turn-machine{display:grid;grid-template-columns:85px 1fr;gap:8px;align-items:center;padding:9px 0;border-bottom:1px solid #e5ebf2}
 .turn-machine strong{color:#12375f}
-.turn-machine input{width:100%;padding:10px;border:1px solid #b9c8d9;border-radius:10px;background:#fff;color:#142238;font:14px system-ui}
+.turn-machine textarea{width:100%;min-height:65px;resize:vertical;padding:10px;border:1px solid #b9c8d9;border-radius:10px;background:#fff;color:#142238;font:14px system-ui}
 .turn-observations{width:100%;padding:11px;border:1px solid #b9c8d9;border-radius:10px;background:#fff;color:#142238;font:15px system-ui;min-height:130px;resize:vertical}
 .turn-save{font-size:12px;color:#287447;margin-top:8px}
 .turn-actions{display:grid;gap:8px;margin-top:12px}
 .turn-back{background:#e8eff7;color:#12375f}
 .turn-home{background:#dce9f8;color:#073b78;width:100%;margin-top:8px}
 .turn-open-button{background:#f28c00;color:#fff;width:100%;margin-top:8px}
-.turn-machine input::placeholder{color:#718096}
+.turn-machine textarea::placeholder{color:#718096}
+.pcp-label{font-weight:800;color:#12375f;background:#eaf3ff;border:1px solid #c9def5;border-radius:10px;padding:10px 12px;min-width:150px}
+.pcp-entry{display:flex;gap:8px;align-items:stretch;margin:9px 0}
+.pcp-entry textarea{flex:1;min-width:0;min-height:70px;resize:vertical;padding:11px;border:1px solid #b9c8d9;border-radius:10px;font:15px system-ui}
 @media(max-width:420px){
 .grid{grid-template-columns:1fr}
 .brand h1{font-size:21px}
-.turn-machine{grid-template-columns:75px 1fr 1fr;gap:6px}
-.turn-machine input{font-size:13px;padding:9px}
+.turn-machine{grid-template-columns:75px 1fr;gap:6px}
+.turn-machine textarea{font-size:13px;padding:9px}
+.pcp-entry{gap:6px}
+.pcp-label{min-width:135px;padding:9px 7px;font-size:13px}
 }
 </style>
 </head>
@@ -198,7 +203,7 @@ button{border:0;border-radius:12px;padding:14px 16px;font-size:16px;font-weight:
 
 <div class="turn-step" data-step="1">
 <div class="turn-title">2. Ferramentaria – Prioridades do PCP</div>
-<p class="muted">Descreva as prioridades e serviços que precisam de atenção.</p>
+<p class="muted">Os marcadores de prioridade são fixos. Digite somente o conteúdo da prioridade na caixa ao lado.</p>
 <div id="pcpList"></div>
 <button class="turn-add" id="addPcp">+ Adicionar prioridade</button>
 </div>
@@ -212,19 +217,19 @@ button{border:0;border-radius:12px;padding:14px 16px;font-size:16px;font-weight:
 
 <div class="turn-step" data-step="3">
 <div class="turn-title">4. Injeção Zamac</div>
-<p class="muted">O número da máquina é fixo. Preencha o item e a condição conforme a situação do turno.</p>
+<p class="muted">Escreva livremente na única caixa de cada máquina. Se deixar vazio, será registrada como PARADA PROGRAMADA.</p>
 <div id="zamacList"></div>
 </div>
 
 <div class="turn-step" data-step="4">
 <div class="turn-title">5. Injeção Alumínio</div>
-<p class="muted">O número da máquina é fixo. Preencha o item e a condição conforme a situação do turno.</p>
+<p class="muted">Escreva livremente na única caixa de cada máquina. Se deixar vazio, será registrada como PARADA PROGRAMADA.</p>
 <div id="aluminioList"></div>
 </div>
 
 <div class="turn-step" data-step="5">
 <div class="turn-title">6. Injeção Plástico</div>
-<p class="muted">O número da máquina é fixo. Preencha o item e a condição conforme a situação do turno.</p>
+<p class="muted">Escreva livremente na única caixa de cada máquina. Se deixar vazio, será registrada como PARADA PROGRAMADA.</p>
 <div id="plasticoList"></div>
 </div>
 
@@ -477,7 +482,6 @@ state.greeting=typeof saved.greeting==="string"?saved.greeting:getGreeting();
 state.shift=typeof saved.shift==="string"?saved.shift:"1° T";
 state.date=typeof saved.date==="string"?saved.date:getDate();
 
-/* Remove prefixos antigos para evitar duplicação */
 state.pcp=Array.isArray(saved.pcp)&&saved.pcp.length
 ?saved.pcp.map(v=>String(v||"").replace(/^\d+-\(PRIORIDADE\):\s*/i,""))
 :[""];
@@ -507,7 +511,7 @@ $("turnSaveMessage").textContent="Não foi possível salvar automaticamente nest
 }
 
 function pcpPrefix(index){
-return(index+1)+"-(PRIORIDADE): ";
+return(index+1)+"-(PRIORIDADE):";
 }
 
 /* LISTAS EDITÁVEIS */
@@ -518,19 +522,45 @@ container.innerHTML="";
 
 list.forEach((value,index)=>{
 const row=document.createElement("div");
+
+if(type==="pcp"){
+row.className="pcp-entry";
+
+const label=document.createElement("div");
+label.className="pcp-label";
+label.textContent=pcpPrefix(index);
+
+const area=document.createElement("textarea");
+area.placeholder="Digite a prioridade...";
+area.value=String(value||"").replace(/^\d+-\(PRIORIDADE\):\s*/i,"");
+area.setAttribute("aria-label","Conteúdo da prioridade "+(index+1));
+
+area.addEventListener("input",()=>{
+state[type][index]=area.value;
+saveState();
+});
+
+const remove=document.createElement("button");
+remove.className="turn-remove";
+remove.type="button";
+remove.textContent="✕";
+remove.title="Excluir esta prioridade";
+
+remove.addEventListener("click",()=>{
+state[type].splice(index,1);
+if(!state[type].length)state[type].push("");
+renderTextList(type,containerId);
+saveState();
+});
+
+row.append(label,area,remove);
+}else{
 row.className="turn-entry";
 
 const area=document.createElement("textarea");
-
-if(type==="pcp"){
-area.placeholder=pcpPrefix(index)+"Digite a prioridade...";
-area.value=String(value||"").replace(/^\d+-\(PRIORIDADE\):\s*/i,"");
-}else{
 area.placeholder="Descreva o serviço de manutenção...";
 area.value=value||"";
-}
-
-area.setAttribute("aria-label",type==="pcp"?"Prioridade "+(index+1):"Manutenção");
+area.setAttribute("aria-label","Manutenção "+(index+1));
 
 area.addEventListener("input",()=>{
 state[type][index]=area.value;
@@ -551,6 +581,8 @@ saveState();
 });
 
 row.append(area,remove);
+}
+
 container.appendChild(row);
 });
 }
@@ -566,34 +598,27 @@ row.className="turn-machine";
 const label=document.createElement("strong");
 label.textContent=machine;
 
-const itemInput=document.createElement("input");
-itemInput.placeholder="Item";
-itemInput.setAttribute("aria-label","Item da máquina "+machine);
-
-const conditionInput=document.createElement("input");
-conditionInput.placeholder="Condição";
-conditionInput.setAttribute("aria-label","Condição da máquina "+machine);
+const textInput=document.createElement("textarea");
+textInput.placeholder="Digite as informações...";
+textInput.setAttribute("aria-label","Informações da máquina "+machine);
 
 const saved=state.statuses[machine];
 
 if(saved&&typeof saved==="object"){
-itemInput.value=saved.item||"";
-conditionInput.value=saved.condition||"";
+textInput.value=[saved.item,saved.condition]
+.map(v=>String(v||"").trim())
+.filter(Boolean)
+.join(" - ");
 }else if(typeof saved==="string"){
-conditionInput.value=saved;
+textInput.value=saved;
 }
 
-itemInput.addEventListener("input",()=>{
-state.statuses[machine]={item:itemInput.value,condition:conditionInput.value};
+textInput.addEventListener("input",()=>{
+state.statuses[machine]=textInput.value;
 saveState();
 });
 
-conditionInput.addEventListener("input",()=>{
-state.statuses[machine]={item:itemInput.value,condition:conditionInput.value};
-saveState();
-});
-
-row.append(label,itemInput,conditionInput);
+row.append(label,textInput);
 container.appendChild(row);
 });
 }
@@ -658,37 +683,26 @@ state.observations=$("turnObservations").value;
 saveState();
 });
 
-/* RELATÓRIO DAS MÁQUINAS */
+/* RELATÓRIO DAS MÁQUINAS - CORRIGIDO */
 function machineReport(title,type){
 const lines=[];
-let hasContent=false;
 
 machines[type].forEach(machine=>{
 const saved=state.statuses[machine];
-let item="",condition="";
+
+let text="";
 
 if(saved&&typeof saved==="object"){
-item=String(saved.item||"").trim();
-condition=String(saved.condition||"").trim();
-}else if(typeof saved==="string"){
-condition=saved.trim();
+text=[saved.item,saved.condition]
+.map(v=>String(v||"").trim())
+.filter(Boolean)
+.join(" - ");
+}else{
+text=String(saved||"").trim();
 }
 
-if(item||condition){
-hasContent=true;
-let line=machine+" _ ";
-
-if(item)line+="*"+item+"*";
-if(item&&condition)line+=" _ ";
-if(condition)line+=condition;
-
-lines.push(line);
-}
+lines.push(machine+" - "+(text||"PARADA PROGRAMADA"));
 });
-
-if(!hasContent){
-return"*"+title+"*"+NL+NL+"PARADA PROGRAMADA";
-}
 
 return"*"+title+"*"+NL+NL+lines.join(NL+NL);
 }
@@ -696,14 +710,17 @@ return"*"+title+"*"+NL+NL+lines.join(NL+NL);
 /* RELATÓRIO DA FERRAMENTARIA */
 function pcpReport(){
 const filled=state.pcp
-.map(v=>String(v||"").replace(/^\d+-\(PRIORIDADE\):\s*/i,"").trim())
-.filter(Boolean);
+.map((v,index)=>({
+index,
+text:String(v||"").replace(/^\d+-\(PRIORIDADE\):\s*/i,"").trim()
+}))
+.filter(v=>v.text);
 
 if(!filled.length){
 return"*Ferramentaria manutenção de moldes itens que estão no processo de injeção crítico PCP*"+NL+NL+"SEM PRIORIDADES NA FERRAMENTARIA";
 }
 
-const numbered=filled.map((v,index)=>pcpPrefix(index)+v);
+const numbered=filled.map(v=>pcpPrefix(v.index)+" "+v.text);
 
 return"*Ferramentaria manutenção de moldes itens que estão no processo de injeção crítico PCP*"+NL+NL+numbered.join(NL+NL);
 }
